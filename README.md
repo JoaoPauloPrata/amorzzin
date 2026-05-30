@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Amorzin v2
 
-## Getting Started
+Páginas personalizadas para presentear quem você ama. O usuário escreve um título, mensagem, data inicial do relacionamento, sobe fotos e (opcional) escolhe uma música. Após pagar, recebe por e-mail o link público + QR Code da página.
 
-First, run the development server:
+## Stack
+
+| Camada       | Tecnologia                                              |
+| ------------ | ------------------------------------------------------- |
+| Frontend     | Next.js 16 (App Router) + TypeScript + Tailwind CSS     |
+| Estado       | Zustand (wizard) + React Hook Form + Zod                |
+| Animação     | Framer Motion                                           |
+| Backend      | Supabase (Postgres + Storage + Edge Functions — **sem Auth**) |
+| Pagamento    | MercadoPago Checkout Pro + Webhook (Edge Function)      |
+| E-mail       | Resend (transactional)                                  |
+| Hosting      | Vercel                                                  |
+| Domínio      | `amorzin.com`                                           |
+
+## Princípios
+
+- **Sem autenticação obrigatória.** Usuário anônimo cria → paga com e-mail → recebe link público.
+- **`edit_token`** UUID secreto autoriza mutações na página antes do pagamento.
+- **RLS estrita.** Leitura pública apenas de conteúdo `active`. Toda mutação passa por Edge Function com `service_role`.
+- **Slug público vs. ID secreto.** URL `/p/<slug>` é o que circula no WhatsApp. `edit_token` nunca aparece em leituras.
+- **Idempotência via `mp_payment_id UNIQUE`.** Webhook MercadoPago pode chegar N vezes sem duplicar pedido.
+
+## Quickstart
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# instalar deps
+npm install
+
+# popular .env.local (copiar de .env.example e preencher)
+cp .env.example .env.local
+
+# dev server
+npm run dev   # http://localhost:3000
+
+# typecheck
+npx tsc --noEmit
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Variáveis de ambiente: ver [`.env.example`](./.env.example).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Documentação
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Toda a doc viva fica em [`docs/`](./docs):
 
-## Learn More
+- [`architecture.md`](./docs/architecture.md) — visão geral, fluxo end-to-end, decisões
+- [`database-schema.md`](./docs/database-schema.md) — tabelas, colunas, índices
+- [`security-rls.md`](./docs/security-rls.md) — modelo de segurança, RLS, `edit_token`
+- [`storage.md`](./docs/storage.md) — buckets, políticas, paths
+- [`development.md`](./docs/development.md) — setup local, migrations, comandos
+- [`conventions.md`](./docs/conventions.md) — convenções de código, naming, estrutura
+- [`edge-functions.md`](./docs/edge-functions.md) — catálogo de funções (preenchido em cada fase)
 
-To learn more about Next.js, take a look at the following resources:
+## Roadmap
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Ver [`../PLANO.md`](../PLANO.md) seção 16.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- ✅ Fase 0 — Setup
+- ✅ Fase 1 — Schema + Storage + RLS
+- ✅ Fase 2 — Landing
+- ✅ Fase 3 — Wizard texto
+- ✅ Fase 4 — Upload fotos
+- 🟡 Fase 5 — Steps restantes (Música ✅, Plan ✅, Review ✅; Animation pendente)
+- ✅ Fase 6 — Pagamento (createPaymentPreference + /payment/return + mp-webhook deployed)
+- ⏳ Fase 7 — QR + E-mail
+- ⏳ Fase 8 — Página pública
+- ⏳ Fase 9 — Polimento

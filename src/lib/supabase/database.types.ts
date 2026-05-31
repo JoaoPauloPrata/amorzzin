@@ -59,14 +59,17 @@ export type Database = {
           contact_phone: string | null
           created_at: string
           edit_token: string
+          email_sent_at: string | null
           expires_at: string | null
           id: string
+          layout_style: string
           message: string | null
           music_embed_url: string | null
           music_provider: string | null
           plan_id: string | null
           recipient_name: string | null
           relationship_start: string | null
+          sections: Json
           slug: string
           status: string
           title: string | null
@@ -81,14 +84,17 @@ export type Database = {
           contact_phone?: string | null
           created_at?: string
           edit_token?: string
+          email_sent_at?: string | null
           expires_at?: string | null
           id?: string
+          layout_style?: string
           message?: string | null
           music_embed_url?: string | null
           music_provider?: string | null
           plan_id?: string | null
           recipient_name?: string | null
           relationship_start?: string | null
+          sections?: Json
           slug?: string
           status?: string
           title?: string | null
@@ -103,14 +109,17 @@ export type Database = {
           contact_phone?: string | null
           created_at?: string
           edit_token?: string
+          email_sent_at?: string | null
           expires_at?: string | null
           id?: string
+          layout_style?: string
           message?: string | null
           music_embed_url?: string | null
           music_provider?: string | null
           plan_id?: string | null
           recipient_name?: string | null
           relationship_start?: string | null
+          sections?: Json
           slug?: string
           status?: string
           title?: string | null
@@ -222,6 +231,7 @@ export type Database = {
     }
     Functions: {
       generate_unique_slug: { Args: never; Returns: string }
+      get_cron_secret: { Args: never; Returns: string }
       reorder_page_photos: {
         Args: {
           p_edit_token: string
@@ -234,6 +244,7 @@ export type Database = {
         Args: { p_page_id: string }
         Returns: undefined
       }
+      verify_reconcile_secret: { Args: { p_token: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

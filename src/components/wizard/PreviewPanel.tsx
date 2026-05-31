@@ -1,93 +1,143 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useWizardStore } from "@/lib/wizard/store";
-import { DateCounter } from "./DateCounter";
-import { cn } from "@/lib/utils/cn";
+import { buildPreviewPayload } from "./preview-payload";
+
+// O iframe roda na largura real da moldura → viewport "de celular" (<768px: md: off,
+// 100svh = altura do iframe). SEM transform/scale, então overflow-hidden + rounded
+// recortam normal e nada vaza. A barra de scroll fica FORA da moldura (coluna à direita).
+const FRAME_W = 284;
+const FRAME_H = 587;
+const BEZEL   = 10;   // padding da moldura (p-2.5)
+const BAR_W   = 6;
+const BAR_GAP = 8;
 
 export function PreviewPanel() {
   const draft  = useWizardStore((s) => s.draft);
   const photos = useWizardStore((s) => s.photos);
+  const style  = draft.layout_style ?? "immersive";
 
-  const title     = draft.title?.trim()          || "Seu título aparece aqui";
-  const recipient = draft.recipient_name?.trim();
-  const message   = draft.message?.trim()        || "Sua mensagem aparece aqui assim que você digitar…";
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [barFrac, setBarFrac] = useState({ size: 1, pos: 0 }); // frações 0..1
 
-  const cover    = photos[0];
-  const hasCover = Boolean(cover);
+  const styleName =
+    style === "polaroid"  ? "Polaroid" :
+    style === "editorial" ? "Revista"  :
+    style === "gallery"   ? "Galeria"  : "Imersivo";
+
+  const payload = buildPreviewPayload(draft, photos);
+  const payloadKey = JSON.stringify(payload);
+
+  const win = () => iframeRef.current?.contentWindow ?? null;
+
+  const measure = useCallback(() => {
+    const w = win();
+    if (!w) return;
+    try {
+      const scrollH = w.document.documentElement.scrollHeight;
+      const clientH = w.innerHeight;
+      const max = Math.max(0, scrollH - clientH);
+      setBarFrac({ size: Math.min(1, clientH / scrollH), pos: max > 0 ? w.scrollY / max : 0 });
+    } catch { /* mesma origem; não deve falhar */ }
+  }, []);
+
+  const post = useCallback(() => {
+    win()?.postMessage({ type: "amorzin-preview", payload }, "*");
+    setTimeout(measure, 500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [payloadKey, measure]);
+
+  useEffect(() => { post(); }, [post]);
+
+  useEffect(() => {
+    function onMsg(e: MessageEvent) { if (e.data?.type === "amorzin-preview-ready") post(); }
+    window.addEventListener("message", onMsg);
+    return () => window.removeEventListener("message", onMsg);
+  }, [post]);
+
+  function onLoad() {
+    post();
+    const w = win();
+    if (w) {
+      w.addEventListener("scroll", measure, { passive: true });
+      setTimeout(measure, 600);
+    }
+  }
+
+  // barra externa
+  const trackH  = FRAME_H;
+  const thumbH  = Math.max(30, barFrac.size * trackH);
+  const thumbTop = barFrac.pos * (trackH - thumbH);
+  const showBar = barFrac.size < 0.999;
+  const dragRef = useRef<{ startY: number; startScroll: number } | null>(null);
+
+  function onThumbDown(e: React.PointerEvent) {
+    const w = win();
+    if (!w) return;
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    dragRef.current = { startY: e.clientY, startScroll: w.scrollY };
+  }
+  function onThumbMove(e: React.PointerEvent) {
+    const d = dragRef.current;
+    const w = win();
+    if (!d || !w) return;
+    const max = Math.max(0, w.document.documentElement.scrollHeight - w.innerHeight);
+    const usable = trackH - thumbH;
+    const delta = usable > 0 ? ((e.clientY - d.startY) / usable) * max : 0;
+    w.scrollTo(0, Math.min(max, Math.max(0, d.startScroll + delta)));
+  }
+  function onThumbUp(e: React.PointerEvent) {
+    dragRef.current = null;
+    try { (e.target as HTMLElement).releasePointerCapture(e.pointerId); } catch { /* ignore */ }
+  }
 
   return (
     <aside className="sticky top-28 hidden md:block">
       <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-ink/50">
-        Pré-visualização
+        Pré-visualização · <span className="text-rose-500">{styleName}</span>
       </p>
 
-      <div className="relative mx-auto w-full max-w-[320px]">
-        <div className="absolute -inset-6 -z-10 rounded-[3rem] bg-gradient-to-br from-rose-200/60 via-lilac-200/60 to-transparent blur-2xl" />
-        <div className="rounded-[2.5rem] border border-white/60 bg-white/80 p-3 shadow-soft backdrop-blur">
-          <div
-            className={cn(
-              "relative aspect-[9/19] overflow-hidden rounded-[2rem] text-white",
-              !hasCover && "bg-gradient-to-b from-rose-500 via-rose-400 to-lilac-500",
-            )}
-          >
-            {hasCover && (
+      <div className="relative mx-auto" style={{ width: FRAME_W + BEZEL * 2 + BAR_GAP + BAR_W }}>
+        <div className="absolute -inset-6 right-2 -z-10 rounded-[3rem] bg-gradient-to-br from-rose-200/60 via-lilac-200/60 to-transparent blur-2xl" />
+
+        <div className="flex items-start" style={{ gap: BAR_GAP }}>
+          {/* moldura do celular */}
+          <div className="rounded-[2.6rem] border border-white/60 bg-white/80 p-2.5 shadow-soft backdrop-blur">
+            <div className="relative overflow-hidden rounded-[2.1rem] bg-black" style={{ width: FRAME_W, height: FRAME_H }}>
+              {/* notch */}
+              <div className="pointer-events-none absolute left-1/2 top-2 z-20 h-5 w-24 -translate-x-1/2 rounded-full bg-black/80" />
+              <iframe
+                ref={iframeRef}
+                title="Pré-visualização"
+                src="/embed/preview"
+                onLoad={onLoad}
+                className="block h-full w-full border-0"
+              />
+            </div>
+          </div>
+
+          {/* barra de scroll FORA da moldura */}
+          <div className="relative shrink-0" style={{ width: BAR_W, height: trackH, marginTop: BEZEL + 2 }}>
+            {showBar && (
               <>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={cover.url}
-                  alt="Capa"
-                  className="absolute inset-0 h-full w-full object-cover"
+                <div className="absolute inset-0 rounded-full bg-rose-200/50" />
+                <div
+                  role="scrollbar"
+                  aria-orientation="vertical"
+                  onPointerDown={onThumbDown}
+                  onPointerMove={onThumbMove}
+                  onPointerUp={onThumbUp}
+                  className="absolute left-0 w-full cursor-grab rounded-full bg-rose-400/80 transition-colors hover:bg-rose-500 active:cursor-grabbing"
+                  style={{ top: thumbTop, height: thumbH }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/35 to-black/70" />
               </>
             )}
-
-            <div className="absolute left-1/2 top-2 h-5 w-24 -translate-x-1/2 rounded-full bg-black/70" />
-
-            {draft.music_embed_url && (
-              <div className="absolute right-3 top-3 z-10 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-1 text-[10px] font-semibold text-white backdrop-blur">
-                <span className="animate-pulse">🎵</span>
-                <span>com música</span>
-              </div>
-            )}
-
-            <div className="relative flex h-full flex-col p-5 pt-10">
-              {recipient && (
-                <p className="text-center text-[10px] uppercase tracking-widest text-white/70">
-                  Para {recipient}
-                </p>
-              )}
-              <h3 className="mt-1 text-center font-display text-2xl leading-tight drop-shadow-sm">
-                {title}
-              </h3>
-
-              <p className="mt-4 line-clamp-6 px-1 text-center text-sm leading-snug text-white/90 drop-shadow-sm">
-                {message}
-              </p>
-
-              {photos.length > 1 && (
-                <div className="mt-3 flex justify-center gap-1">
-                  {photos.map((p, i) => (
-                    <span
-                      key={p.id}
-                      className={cn(
-                        "h-1.5 rounded-full transition-all",
-                        i === 0 ? "w-4 bg-white" : "w-1.5 bg-white/50",
-                      )}
-                    />
-                  ))}
-                </div>
-              )}
-
-              <div className="mt-auto rounded-xl bg-white/15 p-3 text-center backdrop-blur">
-                <DateCounter startDate={draft.relationship_start} />
-              </div>
-            </div>
           </div>
         </div>
 
-        <p className="mt-3 text-center text-[11px] text-ink/50">
-          Visual final pode variar conforme estilo do carrossel.
+        <p className="mt-3 text-center text-[11px] text-ink/50" style={{ width: FRAME_W + BEZEL * 2 }}>
+          Prévia real · role ou arraste a barra
         </p>
       </div>
     </aside>

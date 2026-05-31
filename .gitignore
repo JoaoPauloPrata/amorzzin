@@ -31,6 +31,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# playwright screenshots (dev only)
+/.shots/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

@@ -43,6 +43,8 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
         display: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        serif: ["var(--font-serif)", "Georgia", "Cambria", "serif"],
+        hand: ["var(--font-hand)", "cursive"],
       },
       boxShadow: {
         soft: "0 8px 32px -8px rgba(255, 78, 136, 0.25)",

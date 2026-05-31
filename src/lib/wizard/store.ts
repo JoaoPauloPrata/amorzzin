@@ -13,6 +13,8 @@ export type WizardDraft = {
   plan_id?:            string;
   contact_email?:      string;
   contact_phone?:      string;
+  layout_style?:       "immersive" | "polaroid" | "editorial" | "gallery";
+  sections?:           { title: string; body: string }[];
 };
 
 export type WizardPhoto = {

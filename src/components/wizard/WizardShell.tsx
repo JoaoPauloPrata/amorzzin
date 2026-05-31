@@ -8,17 +8,20 @@ import { Step1Title }   from "./steps/Step1Title";
 import { Step2Message } from "./steps/Step2Message";
 import { Step3Date }    from "./steps/Step3Date";
 import { Step4Photos }  from "./steps/Step4Photos";
+import { StepStyle }    from "./steps/StepStyle";
 import { Step5Music }   from "./steps/Step5Music";
 import { StepContact }  from "./steps/StepContact";
 import { StepPlan }     from "./steps/StepPlan";
 import { StepReview }   from "./steps/StepReview";
 import { PreviewPanel } from "./PreviewPanel";
+import { PreviewMobile } from "./PreviewMobile";
 
 const STEPS = [
   { id: "title",   label: "Pra quem"  },
   { id: "message", label: "Mensagem"  },
   { id: "date",    label: "Data"      },
   { id: "photos",  label: "Fotos"     },
+  { id: "style",   label: "Estilo"    },
   { id: "music",   label: "Música"    },
   { id: "contact", label: "Contato"   },
   { id: "plan",    label: "Plano"     },
@@ -48,7 +51,7 @@ export function WizardShell() {
   const onBack = () => step > 0 && setStep(step - 1);
 
   return (
-    <div className="mx-auto max-w-6xl px-6 pt-28 pb-16">
+    <div className="mx-auto max-w-6xl px-6 pt-28 pb-28 md:pb-16">
       <ProgressBar current={step} />
 
       <div className="mt-10 grid grid-cols-1 gap-10 md:grid-cols-[minmax(0,1fr)_320px] md:gap-14">
@@ -57,14 +60,17 @@ export function WizardShell() {
           {step === 1 && <Step2Message onNext={onNext} onBack={onBack} />}
           {step === 2 && <Step3Date    onNext={onNext} onBack={onBack} />}
           {step === 3 && <Step4Photos  onNext={onNext} onBack={onBack} />}
-          {step === 4 && <Step5Music   onNext={onNext} onBack={onBack} />}
-          {step === 5 && <StepContact  onNext={onNext} onBack={onBack} />}
-          {step === 6 && <StepPlan     onNext={onNext} onBack={onBack} />}
-          {step === 7 && <StepReview                   onBack={onBack} />}
+          {step === 4 && <StepStyle    onNext={onNext} onBack={onBack} />}
+          {step === 5 && <Step5Music   onNext={onNext} onBack={onBack} />}
+          {step === 6 && <StepContact  onNext={onNext} onBack={onBack} />}
+          {step === 7 && <StepPlan     onNext={onNext} onBack={onBack} />}
+          {step === 8 && <StepReview                   onBack={onBack} />}
         </section>
 
         <PreviewPanel />
       </div>
+
+      <PreviewMobile />
     </div>
   );
 }

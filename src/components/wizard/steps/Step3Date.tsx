@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { step3DateSchema, type Step3Date as Values } from "@/lib/wizard/schemas";
+import { step3DateSchema } from "@/lib/wizard/schemas";
 import { useWizardStore } from "@/lib/wizard/store";
 import { updatePage } from "@/app/criar/actions";
 import { StepNav } from "../StepNav";
+import { BrDatePicker } from "../BrDatePicker";
 
 export function Step3Date({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
   const draft     = useWizardStore((s) => s.draft);
@@ -14,27 +13,38 @@ export function Step3Date({ onNext, onBack }: { onNext: () => void; onBack: () =
   const editToken = useWizardStore((s) => s.editToken);
   const patchDraft = useWizardStore((s) => s.patchDraft);
 
-  const [submitErr, setSubmitErr] = useState<string | null>(null);
+  const [value, setValue]       = useState(draft.relationship_start ?? "");
+  const [error, setError]       = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<Values>({
-    resolver: zodResolver(step3DateSchema),
-    defaultValues: { relationship_start: draft.relationship_start ?? "" },
-  });
+  function handleChange(iso: string) {
+    setValue(iso);
+    setError(null);
+    patchDraft({ relationship_start: iso });
+  }
 
-  const today = new Date().toISOString().split("T")[0];
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
 
-  const onSubmit = handleSubmit(async (values) => {
-    setSubmitErr(null);
-    patchDraft(values);
-
-    if (!pageId || !editToken) {
-      setSubmitErr("Sessão expirou. Volte ao passo 1.");
+    const parsed = step3DateSchema.safeParse({ relationship_start: value });
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message ?? "Data inválida");
       return;
     }
-    const res = await updatePage({ id: pageId, edit_token: editToken, ...values });
-    if (!res.ok) { setSubmitErr(res.error); return; }
+
+    if (!pageId || !editToken) {
+      setError("Sessão expirou. Volte ao passo 1.");
+      return;
+    }
+
+    setSubmitting(true);
+    patchDraft({ relationship_start: value });
+    const res = await updatePage({ id: pageId, edit_token: editToken, relationship_start: value });
+    setSubmitting(false);
+    if (!res.ok) { setError(res.error); return; }
     onNext();
-  });
+  }
 
   return (
     <form onSubmit={onSubmit} className="space-y-5">
@@ -48,25 +58,18 @@ export function Step3Date({ onNext, onBack }: { onNext: () => void; onBack: () =
       </header>
 
       <div>
-        <label className="text-sm font-medium text-ink/80">Data de início</label>
-        <input
-          {...register("relationship_start", {
-            onChange: (e) => patchDraft({ relationship_start: e.target.value }),
-          })}
-          type="date"
-          max={today}
-          className="mt-1 w-full rounded-xl border border-ink/15 bg-white/80 px-4 py-3 text-ink shadow-sm outline-none transition-colors focus:border-rose-400"
-        />
-        {errors.relationship_start && (
-          <p className="mt-1 text-xs text-rose-600">{errors.relationship_start.message}</p>
-        )}
+        <label htmlFor="relationship_start" className="text-sm font-medium text-ink/80">
+          Data de início
+        </label>
+        <BrDatePicker id="relationship_start" value={value} onChange={handleChange} />
+        {error && <p className="mt-1 text-xs text-rose-600">{error}</p>}
       </div>
 
       <StepNav
         canBack
         isLast={false}
-        submitting={isSubmitting}
-        error={submitErr}
+        submitting={submitting}
+        error={null}
         onBack={onBack}
       />
     </form>

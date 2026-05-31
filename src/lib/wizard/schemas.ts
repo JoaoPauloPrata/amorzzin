@@ -84,7 +84,41 @@ export const updatePagePayloadSchema = z.object({
   plan_id:            z.string().min(1).max(40).optional(),
   contact_email:      z.string().trim().email().optional(),
   contact_phone:      z.string().trim().max(20).optional(),
+  layout_style:       z.enum(["immersive", "polaroid", "editorial", "gallery"]).optional(),
+  sections:           z
+                        .array(z.object({
+                          title: z.string().trim().max(60),
+                          body:  z.string().trim().max(1500),
+                        }))
+                        .max(8)
+                        .optional(),
 });
+
+// Seções extras da página pública.
+export type Section = { title: string; body: string };
+
+export const SECTION_MAX = 8;
+export const SECTION_BODY_LIMIT = 1500;
+
+// Sugestões prontas (o usuário pode editar título e texto, ou criar do zero).
+export const SECTION_PRESETS: { title: string; placeholder: string }[] = [
+  { title: "O que mais amo em você", placeholder: "Descreve o que você mais ama nessa pessoa…" },
+  { title: "Nossa história",          placeholder: "Conta um pouco de como tudo começou…" },
+  { title: "Nossos sonhos",           placeholder: "O que vocês sonham viver juntos?" },
+  { title: "Momento favorito",        placeholder: "Aquele momento que você nunca esquece…" },
+  { title: "Por que você é especial", placeholder: "O que faz essa pessoa ser única pra você…" },
+];
+
+// Estilos de layout da página pública (espelha o check da coluna pages.layout_style).
+export const LAYOUT_STYLES = ["immersive", "polaroid", "editorial", "gallery"] as const;
+export type LayoutStyle = (typeof LAYOUT_STYLES)[number];
+
+export const LAYOUT_OPTIONS: { id: LayoutStyle; nome: string; desc: string }[] = [
+  { id: "immersive", nome: "Imersivo",  desc: "Fotos preenchem a tela, texto por cima" },
+  { id: "polaroid",  nome: "Polaroid",  desc: "Fotos como retratos inclinados num cartão" },
+  { id: "editorial", nome: "Revista",   desc: "Capa elegante, leitura em rolagem" },
+  { id: "gallery",   nome: "Galeria",   desc: "Mosaico de fotos com toque pra ampliar" },
+];
 
 export type CreatePagePayload = z.infer<typeof createPagePayloadSchema>;
 export type UpdatePagePayload = z.infer<typeof updatePagePayloadSchema>;

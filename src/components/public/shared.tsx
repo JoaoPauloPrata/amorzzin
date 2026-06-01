@@ -39,11 +39,11 @@ export function StorySections({ sections, variant }: { sections: Section[]; vari
             dark ? "bg-white/10 backdrop-blur-md" : "border border-rose-100 bg-white/80 shadow-soft",
           )}>
             {s.title && (
-              <h3 className={cn("mb-2 text-xs font-bold uppercase tracking-[0.2em]", dark ? "text-white/80" : "text-rose-500")}>
+              <h3 className={cn("mb-2 break-words text-xs font-bold uppercase tracking-[0.2em]", dark ? "text-white/80" : "text-rose-500")}>
                 {s.title}
               </h3>
             )}
-            <p className={cn("whitespace-pre-line text-base leading-relaxed", dark ? "text-white/90" : "text-ink/80")}>
+            <p className={cn("whitespace-pre-line break-words text-base leading-relaxed", dark ? "text-white/90" : "text-ink/80")}>
               {s.body}
             </p>
           </div>
@@ -114,9 +114,9 @@ export function OpenOverlay({ emoji, recipient, onOpen }: { emoji: string; recip
       className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-6 bg-gradient-to-b from-rose-500 via-rose-400 to-lilac-500 px-6 text-center text-white"
     >
       <span className="text-6xl" style={{ animation: "amorzinFloatUp 3s linear infinite" }}>{emoji}</span>
-      <div>
+      <div className="max-w-full">
         <p className="font-display text-3xl font-bold drop-shadow">Uma surpresa pra você</p>
-        {recipient && <p className="mt-1 text-white/80">{recipient}, toque para abrir</p>}
+        {recipient && <p className="mt-1 break-words text-white/80">{recipient}, toque para abrir</p>}
       </div>
       <span className="rounded-full bg-white/20 px-6 py-3 text-sm font-semibold backdrop-blur transition-colors hover:bg-white/30">
         Toque para abrir 💌

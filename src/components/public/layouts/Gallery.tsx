@@ -15,7 +15,7 @@ export function Gallery(props: LayoutProps) {
   const message = props.message?.trim();
 
   return (
-    <main className="relative min-h-[100svh] w-full bg-[#fffaf7] text-ink">
+    <main className="relative min-h-[100svh] w-full overflow-x-hidden bg-[#fffaf7] text-ink">
       <FloatingHearts emoji={props.emoji} subtle count={9} />
 
       <section
@@ -25,8 +25,8 @@ export function Gallery(props: LayoutProps) {
         )}
       >
         <header className="mb-10 text-center">
-          {recipient && <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.4em] text-rose-500">Para {recipient}</p>}
-          {title && <h1 className="font-display text-5xl font-bold tracking-tight text-ink md:text-6xl">{title}</h1>}
+          {recipient && <p className="mb-3 max-w-full break-words text-[11px] font-semibold uppercase tracking-[0.4em] text-rose-500">Para {recipient}</p>}
+          {title && <h1 className="break-words font-display text-5xl font-bold tracking-tight text-ink md:text-6xl">{title}</h1>}
           <div className="mx-auto mt-5 flex items-center justify-center gap-3 text-ink/35">
             <span className="h-px w-10 bg-ink/20" />
             <span className="text-[10px] uppercase tracking-[0.3em]">o álbum de nós dois</span>
@@ -56,7 +56,7 @@ export function Gallery(props: LayoutProps) {
         )}
 
         {message && (
-          <p className="mx-auto mt-12 max-w-xl whitespace-pre-line text-center text-lg leading-relaxed text-ink/75">{message}</p>
+          <p className="mx-auto mt-12 max-w-xl whitespace-pre-line break-words text-center text-lg leading-relaxed text-ink/75">{message}</p>
         )}
 
         <StorySections sections={props.sections} variant="light" />

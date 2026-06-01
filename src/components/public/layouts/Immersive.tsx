@@ -22,7 +22,7 @@ export function Immersive(props: LayoutProps) {
   const hasSections = sections.length > 0;
 
   return (
-    <main className="relative w-full bg-[#160a14] text-white">
+    <main className="relative w-full overflow-x-hidden bg-[#160a14] text-white">
       <FloatingHearts emoji={props.emoji} />
 
       {/* hero — tela cheia com foto no fundo */}
@@ -56,15 +56,15 @@ export function Immersive(props: LayoutProps) {
             <i className="h-1.5 w-1.5 rounded-full bg-rose-400" />
           </span>
 
-          {recipient && <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.45em] text-white/75">Para {recipient}</p>}
+          {recipient && <p className="mb-3 max-w-full break-words text-[11px] font-semibold uppercase tracking-[0.45em] text-white/75">Para {recipient}</p>}
           {title && (
-            <h1 className="font-display text-5xl font-bold leading-[1.02] tracking-tight drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)] md:text-6xl">
+            <h1 className="break-words font-display text-5xl font-bold leading-[1.02] tracking-tight drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)] md:text-6xl">
               {title}
             </h1>
           )}
           <span className="mt-5 h-px w-16 bg-gradient-to-r from-transparent via-rose-300 to-transparent" />
 
-          {message && <p className="mt-7 whitespace-pre-line text-[15px] leading-relaxed text-white/90 drop-shadow md:text-base">{message}</p>}
+          {message && <p className="mt-7 whitespace-pre-line break-words text-[15px] leading-relaxed text-white/90 drop-shadow md:text-base">{message}</p>}
 
           {props.relationshipStart && (
             <div className="mt-9 w-full rounded-2xl border border-white/20 bg-white/[0.07] px-5 py-4 backdrop-blur-md">

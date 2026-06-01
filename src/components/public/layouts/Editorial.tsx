@@ -15,7 +15,7 @@ export function Editorial(props: LayoutProps) {
   const rest = photos.slice(1);
 
   return (
-    <main className={cn("relative min-h-[100svh] w-full bg-[#f7f0e6] font-serif text-ink transition-opacity duration-1000", started ? "opacity-100" : "opacity-0")}>
+    <main className={cn("relative min-h-[100svh] w-full overflow-x-hidden bg-[#f7f0e6] font-serif text-ink transition-opacity duration-1000", started ? "opacity-100" : "opacity-0")}>
       {/* capa */}
       <header className="relative flex h-[88svh] items-end overflow-hidden">
         {cover ? (
@@ -28,11 +28,11 @@ export function Editorial(props: LayoutProps) {
           <div className="absolute inset-0 bg-gradient-to-br from-rose-400 to-lilac-500" />
         )}
         <div className="relative z-10 w-full px-7 pb-14 text-cream">
-          <p className="mb-3 font-sans text-[11px] font-semibold uppercase tracking-[0.4em] text-cream/75">
+          <p className="mb-3 max-w-full break-words font-sans text-[11px] font-semibold uppercase tracking-[0.4em] text-cream/75">
             {recipient ? `Uma carta para ${recipient}` : "Uma carta"}
           </p>
           {title && (
-            <h1 className="font-serif text-6xl font-light italic leading-[0.95] drop-shadow-md md:text-8xl">
+            <h1 className="break-words font-serif text-6xl font-light italic leading-[0.95] drop-shadow-md md:text-8xl">
               {title}
             </h1>
           )}
@@ -44,7 +44,7 @@ export function Editorial(props: LayoutProps) {
         {/* mensagem com capitular */}
         {message && (
           <Reveal>
-            <p className="text-pretty text-2xl leading-relaxed text-ink/85 first-letter:float-left first-letter:mr-3 first-letter:font-serif first-letter:text-7xl first-letter:font-bold first-letter:leading-[0.8] first-letter:text-rose-500 md:text-[1.7rem]">
+            <p className="whitespace-pre-line break-words text-pretty text-2xl leading-relaxed text-ink/85 first-letter:float-left first-letter:mr-3 first-letter:font-serif first-letter:text-7xl first-letter:font-bold first-letter:leading-[0.8] first-letter:text-rose-500 md:text-[1.7rem]">
               {message}
             </p>
           </Reveal>
@@ -69,8 +69,8 @@ export function Editorial(props: LayoutProps) {
               <span className="font-sans text-sm font-bold tracking-widest text-rose-400">{String(i + 1).padStart(2, "0")}</span>
               <span className="h-px flex-1 translate-y-[-4px] bg-ink/15" />
             </div>
-            {s.title && <h2 className="mt-3 font-serif text-3xl font-medium italic text-ink md:text-4xl">{s.title}</h2>}
-            <p className="mt-4 text-lg leading-relaxed text-ink/80">{s.body}</p>
+            {s.title && <h2 className="mt-3 break-words font-serif text-3xl font-medium italic text-ink md:text-4xl">{s.title}</h2>}
+            <p className="mt-4 whitespace-pre-line break-words text-lg leading-relaxed text-ink/80">{s.body}</p>
           </Reveal>
         ))}
 

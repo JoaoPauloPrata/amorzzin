@@ -20,7 +20,7 @@ export function Polaroid(props: LayoutProps) {
   }
 
   return (
-    <main className="relative w-full bg-[#fdeef0] text-ink">
+    <main className="relative w-full overflow-x-hidden bg-[#fdeef0] text-ink">
       {/* textura de papel quente */}
       <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(60% 40% at 20% 10%, rgba(255,158,180,0.35), transparent 60%), radial-gradient(50% 40% at 90% 30%, rgba(162,107,232,0.20), transparent 60%)" }} />
       <FloatingHearts emoji={props.emoji} subtle />
@@ -32,7 +32,7 @@ export function Polaroid(props: LayoutProps) {
         )}
       >
         <div className="flex min-h-[86svh] flex-col items-center justify-center text-center">
-          {recipient && <p className="mb-2 font-hand text-4xl text-rose-500">para {recipient}</p>}
+          {recipient && <p className="mb-2 max-w-full break-words font-hand text-4xl text-rose-500">para {recipient}</p>}
 
           {hasPhotos && (
             <button type="button" onClick={next} aria-label="Próxima foto" className="relative mb-7 h-[21rem] w-[16.5rem]">
@@ -43,7 +43,7 @@ export function Polaroid(props: LayoutProps) {
                 <span className="absolute -top-3 left-1/2 h-6 w-24 -translate-x-1/2 -rotate-3 rounded-[2px] bg-rose-300/40 shadow-sm backdrop-blur-[1px]" />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={photos[idx]} alt="" className="h-full w-full rounded-[2px] object-cover" />
-                <span className="absolute inset-x-0 bottom-3 text-center font-hand text-2xl text-ink/70">
+                <span className="absolute inset-x-0 bottom-3 truncate px-4 text-center font-hand text-2xl text-ink/70">
                   {recipient ? `eu & ${recipient}` : "nós dois"}
                 </span>
               </div>
@@ -53,8 +53,8 @@ export function Polaroid(props: LayoutProps) {
 
           {/* cartão-bilhete */}
           <div className="w-full -rotate-1 rounded-2xl border border-rose-100 bg-white p-6 text-left shadow-[0_20px_45px_-22px_rgba(214,51,108,0.5)]">
-            {title && <h1 className="font-hand text-4xl text-rose-600">{title}</h1>}
-            {message && <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-ink/75">{message}</p>}
+            {title && <h1 className="break-words font-hand text-4xl text-rose-600">{title}</h1>}
+            {message && <p className="mt-3 whitespace-pre-line break-words text-sm leading-relaxed text-ink/75">{message}</p>}
             {props.relationshipStart && (
               <div className="mt-5 flex items-center justify-between rounded-xl bg-rose-50 px-4 py-3">
                 <span className="font-hand text-2xl text-rose-500">juntos há</span>

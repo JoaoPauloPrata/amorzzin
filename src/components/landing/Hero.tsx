@@ -21,8 +21,11 @@ export function Hero() {
 
           <h1 className="mt-5 font-display text-5xl font-bold leading-[1.05] text-ink md:text-6xl">
             Declare seu amor
+            {/* texto acessível estável; a versão animada abaixo é aria-hidden */}
+            <span className="sr-only"> para quem você ama</span>
             <br />
-            <span className="gradient-text">
+            {/* min-h reserva 2 linhas → sem layout shift quando a frase longa quebra */}
+            <span className="gradient-text inline-block min-h-[2.1em] align-top">
               <TypingRotator phrases={ROTATING_PHRASES} />
             </span>
           </h1>

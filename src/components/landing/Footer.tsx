@@ -22,7 +22,7 @@ export function Footer() {
           </a>
         </nav>
 
-        <p className="text-xs text-ink/50">© {year} Amorzin · Feito com 💖</p>
+        <p className="text-xs text-ink/70">© {year} Amorzin · Feito com 💖</p>
       </div>
     </footer>
   );

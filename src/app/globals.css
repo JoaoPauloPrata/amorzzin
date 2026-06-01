@@ -11,6 +11,31 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Acessibilidade: respeita usuários que pedem menos movimento (sistema). */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer base {
+  /* Foco visível consistente em todos os elementos interativos (teclado). */
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid #ff4e88;
+    outline-offset: 2px;
+  }
+}
+
 body {
   color: var(--foreground);
   background:

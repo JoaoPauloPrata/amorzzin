@@ -58,14 +58,16 @@ export function Navbar() {
         </div>
 
         <button
-          aria-label="Abrir menu"
+          aria-label={open ? "Fechar menu" : "Abrir menu"}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="rounded-full border border-rose-200 bg-cream/80 p-2 md:hidden"
+          className="grid h-11 w-11 place-items-center rounded-full border border-rose-200 bg-cream/80 md:hidden"
         >
-          <span className="block h-0.5 w-5 bg-ink" />
-          <span className="mt-1 block h-0.5 w-5 bg-ink" />
-          <span className="mt-1 block h-0.5 w-5 bg-ink" />
+          <span aria-hidden className="relative block h-4 w-5">
+            <span className={cn("absolute left-0 block h-0.5 w-5 bg-ink transition-all duration-200", open ? "top-1/2 -translate-y-1/2 rotate-45" : "top-0.5")} />
+            <span className={cn("absolute left-0 top-1/2 block h-0.5 w-5 -translate-y-1/2 bg-ink transition-opacity duration-200", open && "opacity-0")} />
+            <span className={cn("absolute left-0 block h-0.5 w-5 bg-ink transition-all duration-200", open ? "top-1/2 -translate-y-1/2 -rotate-45" : "bottom-0.5")} />
+          </span>
         </button>
       </div>
 
@@ -77,7 +79,7 @@ export function Navbar() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="text-sm font-medium text-ink/80"
+                className="flex min-h-[44px] items-center rounded-lg px-2 text-sm font-medium text-ink/80 transition-colors hover:bg-rose-50 hover:text-rose-600"
               >
                 {l.label}
               </a>

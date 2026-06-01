@@ -20,8 +20,19 @@ export function TypingRotator({
   const [index, setIndex] = useState(0);
   const [shown, setShown] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [animate, setAnimate] = useState(true);
+
+  // Respeita prefers-reduced-motion: sem digitação, mostra a 1ª frase estática.
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const apply = () => setAnimate(!mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
 
   useEffect(() => {
+    if (!animate) return;
     const current = phrases[index];
     let timer: ReturnType<typeof setTimeout>;
 
@@ -38,10 +49,16 @@ export function TypingRotator({
     }
 
     return () => clearTimeout(timer);
-  }, [shown, deleting, index, phrases, typeMs, deleteMs, holdMs]);
+  }, [shown, deleting, index, phrases, typeMs, deleteMs, holdMs, animate]);
+
+  // Decorativo: o texto acessível real fica no <h1> (sr-only). aria-hidden evita
+  // que o leitor de tela anuncie cada caractere digitado.
+  if (!animate) {
+    return <span className={className} aria-hidden="true">{phrases[0]}</span>;
+  }
 
   return (
-    <span className={className} aria-live="polite">
+    <span className={className} aria-hidden="true">
       {shown}
       <span className="ml-0.5 inline-block h-[0.9em] w-[2px] -translate-y-[2px] animate-pulse bg-current align-middle" />
     </span>

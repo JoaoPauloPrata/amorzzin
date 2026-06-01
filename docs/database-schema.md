@@ -20,7 +20,7 @@ plans (id)
 
 | Coluna               | Tipo          | Notas                                       |
 | -------------------- | ------------- | ------------------------------------------- |
-| `id`                 | `text` PK     | Slug do plano: `forever`, `annual`          |
+| `id`                 | `text` PK     | Slug do plano: `monthly`, `annual`          |
 | `display_name`       | `text`        | Nome exibido                                |
 | `price_cents`        | `int`         | Preço em centavos (BRL)                     |
 | `duration_days`      | `int` NULL    | NULL = vitalício; senão expira em N dias    |
@@ -33,10 +33,12 @@ plans (id)
 
 | id        | display_name | price_cents | duration_days | max_photos | max_msg |
 | --------- | ------------ | ----------- | ------------- | ---------- | ------- |
-| `monthly` | Mensal       | 1100        | 30            | 4          | 800     |
+| `monthly` | Mensal       | 1100        | 30            | 8          | 1500    |
 | `annual`  | Anual        | 2100        | 365           | 8          | 1500    |
 
 > Plano `forever` (vitalício) foi removido em `0004_replace_forever_with_monthly.sql` — custo de manter infra indefinidamente é incerto.
+>
+> `0013_equalize_plan_limits.sql` igualou os benefícios: planos diferem **apenas em preço e duração**. `monthly` subiu de 4→8 fotos e 800→1500 chars (1500 já era o limite real aplicado no wizard/schema). `max_message_length` não é enforçado por plano — `step2MessageSchema` chumba 1500 pra todos.
 
 ### `pages` — conteúdo da página
 
@@ -51,15 +53,18 @@ plans (id)
 | `recipient_name`          | `text`        |                                                         |
 | `message`                 | `text`        | Texto principal                                         |
 | `relationship_start`      | `date`        | Base do contador de tempo                               |
-| `music_embed_url`         | `text`        | URL YouTube/Spotify validada                            |
-| `music_provider`          | `text` CHECK  | `youtube` \| `spotify`                                  |
+| `music_embed_url`         | `text`        | URL do YouTube validada (Spotify descontinuado)         |
+| `music_provider`          | `text` CHECK  | `youtube` \| `spotify` — CHECK aceita ambos, mas só `youtube` é usado (embed via `youtube-nocookie`); Spotify nunca chegou a embutir |
 | `animation_type`          | `text` CHECK  | `hearts` \| `heart_eyes` \| `custom`                    |
 | `animation_custom_emoji`  | `text`        | 1-2 chars                                               |
-| `carousel_style`          | `text` CHECK  | `fade` \| `slide` \| `zoom` \| `flip` \| `coverflow`    |
+| `carousel_style`          | `text` CHECK  | `fade` \| `slide` \| `zoom` \| `flip` \| `coverflow` — **legado**, não usado pelos layouts atuais (cada `layout_style` tem sua própria animação) |
+| `layout_style`            | `text` CHECK  | `immersive` \| `polaroid` \| `editorial` \| `gallery` — estilo da página pública (migration `0011`) |
+| `sections`                | `jsonb`       | Seções extras `[{title, body}]` (≤8) reveladas no scroll (migration `0012`) |
 | `contact_email`           | `text`        |                                                         |
 | `contact_phone`           | `text`        |                                                         |
 | `activated_at`            | `timestamptz` | Setado no webhook approved                              |
 | `expires_at`              | `timestamptz` | `activated_at + duration_days` (NULL = vitalício)       |
+| `email_sent_at`           | `timestamptz` | Claim atômico de idempotência do e-mail de confirmação (migration `0007`) |
 | `created_at` / `updated_at` | `timestamptz` | Trigger `set_updated_at`                              |
 
 **Índices:**

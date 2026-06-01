@@ -5,17 +5,27 @@
 | Atributo            | Valor                                                          |
 | ------------------- | -------------------------------------------------------------- |
 | Público             | ✅ — leitura via `/object/public/page-photos/<path>`            |
-| Limite por arquivo  | 5 MB                                                           |
-| MIME aceitos        | `image/jpeg`, `image/png`, `image/webp`, `image/heic`          |
+| Limite por arquivo (input) | 5 MB                                                    |
+| MIME aceitos (input) | `image/jpeg`, `image/png`, `image/webp`, `image/heic`         |
+| Formato armazenado  | **WebP** (reprocessado no upload via `sharp`)                  |
+| Cache-control       | `31536000` (1 ano) — path é uuid imutável                      |
 | Policy `storage.objects` | nenhuma para anon (uploads via service_role)              |
+
+**Reprocessamento no upload** (`uploadPhoto`, `photo-actions.ts`): cada imagem passa por
+`sharp` antes de subir — orienta via EXIF, reduz o lado maior pra ≤1600px, converte pra
+WebP (q80) e descarta metadados. Corta storage **e** egress (plano free Supabase:
+1 GB / 5 GB-mês). HEIC de iPhone é decodificado e convertido; se o decode falhar, faz
+fallback pro arquivo original. `bodySizeLimit` do Server Action está em `6mb` (default 1 MB
+rejeitaria upload >1 MB) — ver `next.config.mjs`.
 
 **Path convention:**
 
 ```
-page-photos/<page_id>/<uuid>.<ext>
+page-photos/<page_id>/<uuid>.webp
 ```
 
 `<uuid>` é regerado a cada upload (sem colisão por nome, sem leak de filename original).
+Extensão normalmente `.webp` (ou a original se o reprocessamento falhar).
 
 **Por que sem SELECT policy?** Bucket marcado `public = true` libera leitura direta via URL `/object/public/...`. Adicionar SELECT policy ampla apenas habilitaria `list_objects` (advisor `public_bucket_allows_listing` flagga isso).
 

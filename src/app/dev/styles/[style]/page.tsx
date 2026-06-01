@@ -25,7 +25,7 @@ const PHOTOS = [
 
 const FAKE: LayoutProps = {
   title:             "Eu te amo",
-  recipient:         "Marina",
+  recipient:         "Maria Luisa",
   message:           "Desde o dia em que te conheci, tudo ficou mais leve.\nObrigado por ser meu lugar favorito no mundo. 💛",
   relationshipStart: "2021-06-12",
   photos:            PHOTOS,

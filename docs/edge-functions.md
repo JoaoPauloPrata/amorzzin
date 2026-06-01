@@ -22,7 +22,7 @@ Mutations distribuídas em duas camadas:
 ### `updatePage` (Fase 3 — IMPLEMENTADO, ampliado nas Fases 5+)
 
 - **Arquivo:** `src/app/criar/actions.ts`
-- **Input:** `{ id, edit_token, ...patch }`. Patch aceita `recipient_name`, `title`, `message`, `relationship_start`, `contact_email`, `contact_phone`, `music_embed_url` (nullable), `music_provider` (nullable, `youtube|spotify`).
+- **Input:** `{ id, edit_token, ...patch }`. Patch aceita `recipient_name`, `title`, `message`, `relationship_start`, `contact_email`, `contact_phone`, `music_embed_url` (nullable), `music_provider` (nullable; só `youtube` na prática — Spotify descontinuado), `plan_id`, `layout_style` (`immersive|polaroid|editorial|gallery`), `sections[]` (≤8, `{title,body}`).
 - **Output:** `{ ok: true } | { ok: false, error }`
 - **Validações:** match `edit_token`; status ∉ {`active`, `expired`}
 - **Side-effects:** UPDATE em `pages`
@@ -33,7 +33,8 @@ Mutations distribuídas em duas camadas:
 - **Input:** `FormData` com `page_id`, `edit_token`, `file`
 - **Output:** `{ ok: true, photo: { id, position, url, storagePath } } | { ok: false, error }`
 - **Validações:** match `edit_token`; status ∉ {`active`,`expired`}; MIME ∈ {`image/jpeg|png|webp|heic`}; size ≤ 5 MB; count(`page_photos`) < limite (do plano se houver; fallback `PHOTO_FALLBACK_MAX = 8`)
-- **Side-effects:** upload `page-photos/<page_id>/<uuid>.<ext>` + INSERT `page_photos`
+- **Reprocessamento:** `sharp` antes do upload — orienta EXIF, reduz lado maior ≤1600px, converte pra **WebP** q80, descarta metadados (fallback pro original se falhar). Upload com `cacheControl: 31536000` (1 ano). Corta storage/egress. Requer `bodySizeLimit: "6mb"` no `next.config.mjs` (default 1 MB rejeitaria >1 MB).
+- **Side-effects:** upload `page-photos/<page_id>/<uuid>.webp` + INSERT `page_photos`
 
 ### `deletePhoto` (Fase 4 — IMPLEMENTADO)
 
@@ -81,7 +82,7 @@ Mutations distribuídas em duas camadas:
 - **Arquivo:** `src/app/criar/payment-actions.ts`
 - **Input:** `{ page_id, edit_token }`
 - **Output:** `{ ok: true, status, page_status, slug } | { ok: false, error }`
-- **Uso:** polling em `/payment/return` (2s × 60s) cobrindo casos de webhook atrasado/perdido
+- **Uso:** polling em `/payment/return` (2s × 60s). **Passivo** — só lê `payment_orders.status` do banco (não consulta o MP). Cobre webhook que chega DENTRO da janela; webhook perdido/atrasado além disso é recuperado pelo cron `reconcile-payments`. (Backlog: tornar o polling ativo single-page; pré-requisito do bypass interno já está pronto.)
 
 ---
 
@@ -93,32 +94,46 @@ Mutations distribuídas em duas camadas:
 - **Deploy:** via `mcp__supabase__deploy_edge_function`. `verify_jwt=false` porque autenticação é HMAC, não JWT.
 - **URL:** `https://<project-ref>.supabase.co/functions/v1/mp-webhook`
 - **Método:** POST público (aceita GET pra ping)
-- **Headers:** `x-signature` (`ts=…,v1=…`) + `x-request-id`
+- **Headers:** `x-signature` (`ts=…,v1=…`) + `x-request-id` (webhook real do MP); ou `x-internal-secret` (chamador interno, ver abaixo)
 - **Body:** payload MercadoPago (formato v2: `{ action, data: { id } }`) ou legacy
-- **Retorno:** `200 OK` em todos casos não-críticos (MP re-tenta a cada 15min em qualquer outro código)
+- **Retorno:** `200 OK` em todos casos não-críticos (MP re-tenta a cada 15min em qualquer outro código); `401` se assinatura obrigatória falhar
 - **Side-effects:**
   - Extrai paymentId de `data.id`, `id` query param ou `body.data.id`
   - Filtra topic ≠ `payment*` (responde 200 ignored)
-  - Valida HMAC SHA-256 sobre template `id:<dataId_lowercase>;request-id:<x-request-id>;ts:<ts>;` com `MP_WEBHOOK_SECRET` (constant-time compare)
-  - GET `https://api.mercadopago.com/v1/payments/<id>` com `Bearer ${MP_ACCESS_TOKEN}`
+  - GET `https://api.mercadopago.com/v1/payments/<id>` com `Bearer ${MP_ACCESS_TOKEN}` (fonte de verdade autenticada)
   - UPDATE order existente (selecionada pelo `page_id` = `external_reference`) OU INSERT fallback
-  - Se status mapeado = `approved`: UPDATE `pages` `status='active'`, `activated_at=now()`, `expires_at = now() + plans.duration_days`
-  - **NÃO** dispara e-mail (Fase 7)
+  - Se status mapeado = `approved`: ativa a página (`status='active'`, `activated_at=now()`, `expires_at = now() + plans.duration_days`) **e dispara `send-confirmation-email`** (idempotente). Falha de e-mail não derruba o webhook.
+- **Enforcement de assinatura (por ambiente):**
+  - HMAC SHA-256 sobre `id:<dataId_lowercase>;request-id:<x-request-id>;ts:<ts>;` com `MP_WEBHOOK_SECRET` (constant-time).
+  - `WEBHOOK_SKIP_SIGNATURE=true` → ignora (ambiente de teste; **remover pré-launch**).
+  - senão `payment.live_mode=true` (produção) → assinatura **obrigatória**, `401` se inválida/ausente.
+  - senão `live_mode=false` (teste) → assinatura opcional.
+- **Bypass interno (`x-internal-secret`):** re-injeções server-to-server (cron `reconcile-payments`, futuro polling) **não** carregam a `x-signature` do MP e em produção seriam rejeitadas com 401. O chamador manda `x-internal-secret` = segredo do Vault `reconcile_cron_secret`, validado via RPC `verify_reconcile_secret`; quando válido, dispensa a assinatura (a busca autenticada no MP já garante que o pagamento é real). Corrigido em mp-webhook v18 / reconcile v5 (01/06/2026).
 - **Status mapping:** approved/authorized → approved; rejected → rejected; refunded/charged_back → refunded; cancelled/expired → cancelled; resto → pending
 
-### `send-confirmation-email` (Fase 7)
+### `send-confirmation-email` (Fase 7 — IMPLEMENTADO)
 
-- **Caminho:** `supabase/functions/send-confirmation-email/index.ts`
-- **Invocada por:** `mp-webhook` (interna)
+- **Caminho:** `supabase/functions/send-confirmation-email/index.ts` (`verify_jwt=false`)
+- **Invocada por:** `mp-webhook` (interna) e `reconcile-payments` (via re-injeção no webhook)
 - **Body:** `{ page_id }`
+- **Auth:** `Bearer` service_role **ou** segredo do Vault validado por `verify_reconcile_secret`.
+- **Idempotência:** claim atômico em `pages.email_sent_at` (`UPDATE ... WHERE email_sent_at IS NULL ... returning`). 2ª chamada vira no-op (early return). Em falha de envio, reverte o claim.
 - **Side-effects:**
   - Gera QR Code PNG → upload `page-qrcodes/<page_id>.png`
-  - Cria signed URL 7d
-  - Envia e-mail via Resend com link `/p/<slug>` + QR Code anexado
+  - Envia e-mail via Resend (`from: RESEND_FROM`) com link `/p/<slug>` + QR Code anexado
+- **Falha Resend:** `throw` → 500 genérico `"send failed"` + reverte claim (não vaza erro do provedor).
+- **Prod TODO:** domínio `amorzzin.com` verificado; falta rotacionar `RESEND_API_KEY`.
 
-### `cleanup-drafts` (Fase 9 — cron)
+### `reconcile-payments` (Fase 9 — cron, IMPLEMENTADO)
 
-- **Trigger:** pg_cron diário
+- **Caminho:** `supabase/functions/reconcile-payments/index.ts` (`verify_jwt=false`)
+- **Trigger:** pg_cron `*/5 * * * *` via pg_net (migration `0008`); `Authorization: Bearer <reconcile_cron_secret do Vault>`, validado por `verify_reconcile_secret` (migration `0007`).
+- **Lógica:** acha `pages` presas em `pending_payment` (janela 3min–24h, lote 50); pra cada uma busca no MP por `external_reference=page_id`; se houver pagamento `approved`, **re-injeta no `mp-webhook`** (`?data.id=…&type=payment` + header `x-internal-secret`) — que faz ativação + e-mail idempotentes. **Não duplica** a lógica de ativação (1 fonte de verdade).
+- **Retorno:** `{ ok, checked, recovered }`.
+
+### `cleanup-drafts` (Fase 9 — cron, IMPLEMENTADO)
+
+- **Trigger:** pg_cron (migration `0009`)
 - **Lógica:** DELETE `pages` WHERE status='draft' AND created_at < now() - interval '7 days'
 - **Side-effects:** CASCADE em `page_photos` (rows) + cleanup de objects no Storage
 

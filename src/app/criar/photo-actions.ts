@@ -209,6 +209,15 @@ export async function uploadPhoto(formData: FormData): Promise<UploadPhotoResult
     return { ok: false, error: `Limite de ${maxPhotos} fotos atingido.` };
   }
 
+  // Posição vinda do cliente: quando o batch sobe em paralelo, cada arquivo carrega
+  // seu índice único (base + i). Sem isso, várias inserções concorrentes leem o mesmo
+  // `count` e gravam a mesma `position`, embaralhando a ordem. Fallback pro count.
+  const positionRaw = formData.get("position");
+  const desiredPosition =
+    typeof positionRaw === "string" && Number.isInteger(Number(positionRaw)) && Number(positionRaw) >= 0
+      ? Number(positionRaw)
+      : current;
+
   const inputBuffer = Buffer.from(await file.arrayBuffer());
   const processed   = await reprocessImage(inputBuffer, file.type as PhotoMime);
 
@@ -232,7 +241,7 @@ export async function uploadPhoto(formData: FormData): Promise<UploadPhotoResult
     .from("page_photos")
     .insert({
       page_id:      idCheck.data.page_id,
-      position:     current,
+      position:     desiredPosition,
       storage_path: path,
     })
     .select("id, position, storage_path")

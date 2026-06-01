@@ -28,6 +28,7 @@ type WizardState = {
   editToken:  string | null;
   slug:       string | null;
   step:       number;
+  maxStep:    number;
   draft:      WizardDraft;
   photos:     WizardPhoto[];
 
@@ -38,11 +39,12 @@ type WizardState = {
   reset:      () => void;
 };
 
-const INITIAL: Pick<WizardState, "pageId" | "editToken" | "slug" | "step" | "draft" | "photos"> = {
+const INITIAL: Pick<WizardState, "pageId" | "editToken" | "slug" | "step" | "maxStep" | "draft" | "photos"> = {
   pageId:    null,
   editToken: null,
   slug:      null,
   step:      0,
+  maxStep:   0,
   draft:     {},
   photos:    [],
 };
@@ -53,7 +55,10 @@ export const useWizardStore = create<WizardState>()(
       ...INITIAL,
       setPage: (id, editToken, slug) =>
         set({ pageId: id, editToken, slug }),
-      setStep: (step) => set({ step }),
+      // maxStep só sobe — registra o passo mais distante já alcançado (validado via
+      // submit de cada etapa). É o que libera clique direto no stepper sem deixar
+      // pular pra etapas ainda não preenchidas.
+      setStep: (step) => set((s) => ({ step, maxStep: Math.max(s.maxStep, step) })),
       patchDraft: (patch) =>
         set((s) => ({ draft: { ...s.draft, ...patch } })),
       setPhotos: (photos) => set({ photos }),

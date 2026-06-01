@@ -76,26 +76,44 @@ export function Step4Photos({ onNext, onBack }: { onNext: () => void; onBack: ()
     const toUpload = arr.slice(0, slots);
     if (toUpload.length === 0) return;
 
+    // Posição-base capturada antes do batch — cada arquivo recebe um índice único
+    // (base + i), evitando colisão de `position` quando os uploads correm em paralelo.
+    const basePosition = photos.length;
+
     setUploading((n) => n + toUpload.length);
 
-    for (const file of toUpload) {
-      const formData = new FormData();
-      formData.set("page_id",    pageId);
-      formData.set("edit_token", editToken);
-      formData.set("file",       file);
+    // Paralelo em vez de sequencial: em mobile com HEIC grande + reprocess no server,
+    // o envio um-a-um soma todos os tempos. try/finally garante que o contador SEMPRE
+    // decrementa — sem isso, uma exceção (timeout/rede) deixava o botão preso em "Salvando…".
+    await Promise.all(
+      toUpload.map(async (file, i) => {
+        const formData = new FormData();
+        formData.set("page_id",    pageId);
+        formData.set("edit_token", editToken);
+        formData.set("file",       file);
+        formData.set("position",   String(basePosition + i));
 
-      const res = await uploadPhoto(formData);
-      if (res.ok) {
-        const current = useWizardStore.getState().photos;
-        useWizardStore.getState().setPhotos([
-          ...current,
-          { id: res.photo.id, position: res.photo.position, url: res.photo.url },
-        ]);
-      } else {
-        setError(res.error);
-      }
-      setUploading((n) => n - 1);
-    }
+        try {
+          const res = await uploadPhoto(formData);
+          if (res.ok) {
+            const current = useWizardStore.getState().photos;
+            useWizardStore.getState().setPhotos(
+              [
+                ...current,
+                { id: res.photo.id, position: res.photo.position, url: res.photo.url },
+              ].sort((a, b) => a.position - b.position),
+            );
+          } else {
+            setError(res.error);
+          }
+        } catch (err) {
+          console.error("uploadPhoto lançou exceção", err);
+          setError("Não deu pra enviar uma das imagens. Tenta de novo.");
+        } finally {
+          setUploading((n) => n - 1);
+        }
+      }),
+    );
   }, [pageId, editToken, photos.length, uploading, maxPhotos]);
 
   const onPickClick   = () => inputRef.current?.click();

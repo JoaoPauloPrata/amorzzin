@@ -31,6 +31,7 @@ const STEPS = [
 export function WizardShell() {
   const hydrated = useHydrated();
   const step      = useWizardStore((s) => s.step);
+  const maxStep   = useWizardStore((s) => s.maxStep);
   const setStep   = useWizardStore((s) => s.setStep);
   const pageId    = useWizardStore((s) => s.pageId);
 
@@ -52,7 +53,7 @@ export function WizardShell() {
 
   return (
     <div className="mx-auto max-w-6xl px-6 pt-28 pb-28 md:pb-16">
-      <ProgressBar current={step} />
+      <ProgressBar current={step} maxStep={maxStep} onStep={setStep} />
 
       <div className="mt-10 grid grid-cols-1 gap-10 md:grid-cols-[minmax(0,1fr)_320px] md:gap-14">
         <section className="rounded-3xl border border-rose-100 bg-white/70 p-6 backdrop-blur md:p-10">
@@ -75,30 +76,63 @@ export function WizardShell() {
   );
 }
 
-function ProgressBar({ current }: { current: number }) {
+function ProgressBar({
+  current,
+  maxStep,
+  onStep,
+}: {
+  current: number;
+  maxStep: number;
+  onStep: (step: number) => void;
+}) {
   return (
     <ol className="flex flex-wrap items-center gap-2 md:gap-3">
       {STEPS.map((s, i) => {
-        const isActive = i === current;
-        const isDone   = i <  current;
+        const isActive    = i === current;
+        const isDone      = i < maxStep && !isActive;
+        // Navegável: qualquer passo já alcançado (≤ maxStep), exceto o atual.
+        const isClickable = i <= maxStep && !isActive;
+
+        const badge = (
+          <span
+            className={cn(
+              "grid h-7 w-7 place-items-center rounded-full text-xs font-bold transition-colors",
+              isActive && "bg-gradient-to-r from-rose-500 to-lilac-500 text-white shadow-soft",
+              isDone   && "bg-rose-100 text-rose-600",
+              !isActive && !isDone && "bg-ink/10 text-ink/50",
+            )}
+          >
+            {isDone ? "✓" : i + 1}
+          </span>
+        );
+
+        const label = (
+          <span className={cn(
+            "hidden text-sm font-medium md:inline",
+            isActive ? "text-ink" : "text-ink/50",
+          )}>
+            {s.label}
+          </span>
+        );
+
         return (
           <li key={s.id} className="flex items-center gap-2">
-            <span
-              className={cn(
-                "grid h-7 w-7 place-items-center rounded-full text-xs font-bold transition-colors",
-                isActive && "bg-gradient-to-r from-rose-500 to-lilac-500 text-white shadow-soft",
-                isDone   && "bg-rose-100 text-rose-600",
-                !isActive && !isDone && "bg-ink/10 text-ink/50",
-              )}
-            >
-              {isDone ? "✓" : i + 1}
-            </span>
-            <span className={cn(
-              "hidden text-sm font-medium md:inline",
-              isActive ? "text-ink" : "text-ink/50",
-            )}>
-              {s.label}
-            </span>
+            {isClickable ? (
+              <button
+                type="button"
+                onClick={() => onStep(i)}
+                className="flex items-center gap-2 rounded-full transition-opacity hover:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+                aria-label={`Ir para etapa ${i + 1}: ${s.label}`}
+              >
+                {badge}
+                {label}
+              </button>
+            ) : (
+              <div className="flex items-center gap-2" aria-current={isActive ? "step" : undefined}>
+                {badge}
+                {label}
+              </div>
+            )}
             {i < STEPS.length - 1 && (
               <span className="hidden h-px w-4 bg-ink/15 md:block" />
             )}

@@ -1,6 +1,19 @@
 import { z } from "zod";
 import { parseYouTubeUrl } from "@/lib/utils/youtube";
 
+// Email: o `.email()` do zod aceita coisas como `a@b` (sem domínio/TLD). Exige
+// formato `local@dominio.tld` com TLD de ≥2 letras.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
+
+// Telefone BR (WhatsApp): normaliza pra dígitos, descarta DDI 55 opcional, exige
+// DDD(2) + número (8 dígitos fixo ou 9 dígitos móvel) → 10 ou 11 dígitos. Rejeita
+// letras e qualquer formato fora disso. Aceita máscara `() - + espaço`.
+export function isValidBrPhone(raw: string): boolean {
+  let d = raw.replace(/\D/g, "");
+  if ((d.length === 12 || d.length === 13) && d.startsWith("55")) d = d.slice(2);
+  return d.length === 10 || d.length === 11;
+}
+
 export const step1TitleSchema = z.object({
   recipient_name: z
     .string()
@@ -50,11 +63,16 @@ export const stepContactSchema = z.object({
     .string()
     .trim()
     .min(1, "E-mail obrigatório — é por onde mandamos o link")
-    .email("E-mail inválido"),
+    .max(254, "E-mail muito longo")
+    .regex(EMAIL_RE, "E-mail inválido"),
   contact_phone: z
     .string()
     .trim()
     .max(20, "Máximo 20 caracteres")
+    .refine(
+      (v) => isValidBrPhone(v),
+      "Telefone inválido — use DDD + número, ex.: (11) 98765-4321",
+    )
     .optional()
     .or(z.literal("")),
 });
@@ -82,8 +100,8 @@ export const updatePagePayloadSchema = z.object({
   music_provider:     z.enum(["youtube", "spotify"]).nullable().optional(),
   // plan_id: setado pelo Step Plan. Validado contra DB no createPaymentPreference.
   plan_id:            z.string().min(1).max(40).optional(),
-  contact_email:      z.string().trim().email().optional(),
-  contact_phone:      z.string().trim().max(20).optional(),
+  contact_email:      z.string().trim().max(254).regex(EMAIL_RE, "E-mail inválido").optional(),
+  contact_phone:      z.string().trim().max(20).refine(isValidBrPhone, "Telefone inválido").optional(),
   layout_style:       z.enum(["immersive", "polaroid", "editorial", "gallery"]).optional(),
   sections:           z
                         .array(z.object({

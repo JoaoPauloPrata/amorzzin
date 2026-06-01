@@ -1,0 +1,16 @@
+# Trata assets binários como binário — evita que core.autocrlf (Windows)
+# tente normalizar quebras de linha e corrompa/altere os arquivos.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.webp  binary
+*.gif   binary
+*.ico   binary
+*.avif  binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.mp4   binary
+*.webm  binary
+*.pdf   binary

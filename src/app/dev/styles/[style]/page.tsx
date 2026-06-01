@@ -12,14 +12,15 @@ export const dynamic = "force-dynamic";
 const STYLES = ["immersive", "polaroid", "editorial", "gallery"] as const;
 type Style = (typeof STYLES)[number];
 
-// Fotos fake estáveis (picsum por seed).
+// Fotos de exemplo reais (public/exemplos, otimizadas pra WebP).
 const PHOTOS = [
-  "https://picsum.photos/seed/amorzin1/900/1200",
-  "https://picsum.photos/seed/amorzin2/900/1200",
-  "https://picsum.photos/seed/amorzin3/1200/900",
-  "https://picsum.photos/seed/amorzin4/900/1200",
-  "https://picsum.photos/seed/amorzin5/1200/900",
-  "https://picsum.photos/seed/amorzin6/900/1200",
+  "/exemplos/exemplo-1.webp",
+  "/exemplos/exemplo-2.webp",
+  "/exemplos/exemplo-3.webp",
+  "/exemplos/exemplo-4.webp",
+  "/exemplos/exemplo-5.webp",
+  "/exemplos/exemplo-6.webp",
+  "/exemplos/exemplo-7.webp",
 ];
 
 const FAKE: LayoutProps = {

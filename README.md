@@ -13,7 +13,7 @@ Páginas personalizadas para presentear quem você ama. O usuário escreve um t�
 | Pagamento    | MercadoPago Checkout Pro + Webhook (Edge Function)      |
 | E-mail       | Resend (transactional)                                  |
 | Hosting      | Vercel                                                  |
-| Domínio      | `amorzin.com`                                           |
+| Domínio      | `amorzzin.com` (live; `www` + apex)                     |
 
 ## Princípios
 
@@ -64,6 +64,8 @@ Ver [`../PLANO.md`](../PLANO.md) seção 16.
 - ✅ Fase 4 — Upload fotos
 - 🟡 Fase 5 — Steps restantes (Música ✅, Plan ✅, Review ✅; Animation pendente)
 - ✅ Fase 6 — Pagamento (createPaymentPreference + /payment/return + mp-webhook deployed)
-- ⏳ Fase 7 — QR + E-mail
-- ⏳ Fase 8 — Página pública
-- ⏳ Fase 9 — Polimento
+- ✅ Fase 7 — QR + E-mail (idempotente via `email_sent_at`; Resend domínio `amorzzin.com` verificado)
+- ✅ Fase 8 — Página pública (4 layouts: immersive/polaroid/editorial/gallery + seções)
+- 🟡 Fase 9 — Polimento (✅ reconcile-payments cron, cleanup-drafts cron, otimização de imagem sharp→WebP, deploy Vercel; ⏳ anti-abuso Turnstile+ratelimit, rotacionar RESEND_API_KEY, remover WEBHOOK_SKIP_SIGNATURE, token MP de produção)
+
+> **Estado live (jun/2026):** deployado em `amorzzin.com`. Ainda em validação pré-produção total — ver pendências de go-live na Fase 9.

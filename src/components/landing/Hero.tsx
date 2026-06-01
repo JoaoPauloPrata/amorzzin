@@ -43,6 +43,12 @@ export function Hero() {
               Criar minha página
               <span className="transition-transform group-hover:translate-x-1">›</span>
             </Link>
+            <Link
+              href="/exemplos"
+              className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-white/60 px-5 py-3 text-sm font-semibold text-ink/80 backdrop-blur transition-colors hover:border-rose-300 hover:text-rose-600"
+            >
+              👀 Ver exemplos
+            </Link>
             <a
               href="#como-funciona"
               className="text-sm font-medium text-ink/70 underline-offset-4 hover:underline"

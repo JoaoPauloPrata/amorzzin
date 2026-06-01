@@ -1,43 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import type { LayoutProps } from "@/components/public/shared";
 import { Immersive } from "@/components/public/layouts/Immersive";
 import { Polaroid } from "@/components/public/layouts/Polaroid";
 import { Editorial } from "@/components/public/layouts/Editorial";
 import { Gallery } from "@/components/public/layouts/Gallery";
+import { EXAMPLE_PAGE, EXAMPLE_STYLES, type ExampleStyle } from "@/lib/example-page";
 
 export const dynamic = "force-dynamic";
-
-const STYLES = ["immersive", "polaroid", "editorial", "gallery"] as const;
-type Style = (typeof STYLES)[number];
-
-// Fotos de exemplo reais (public/exemplos, otimizadas pra WebP).
-const PHOTOS = [
-  "/exemplos/exemplo-1.webp",
-  "/exemplos/exemplo-2.webp",
-  "/exemplos/exemplo-3.webp",
-  "/exemplos/exemplo-4.webp",
-  "/exemplos/exemplo-5.webp",
-  "/exemplos/exemplo-6.webp",
-  "/exemplos/exemplo-7.webp",
-];
-
-const FAKE: LayoutProps = {
-  title:             "Eu te amo",
-  recipient:         "Maria Luisa",
-  message:           "Desde o dia em que te conheci, tudo ficou mais leve.\nObrigado por ser meu lugar favorito no mundo. 💛",
-  relationshipStart: "2021-06-12",
-  photos:            PHOTOS,
-  musicVideoId:      null,
-  emoji:             "❤️",
-  autoOpen:          true,
-  sections: [
-    { title: "Nossa história", body: "Começou num café chuvoso de terça. Você atrasou 20 minutos e mesmo assim foi o melhor encontro da minha vida." },
-    { title: "O que mais amo em você", body: "Seu jeito de rir alto sem se importar com quem está olhando. Sua coragem. O jeito que você me olha quando acha que eu não tô vendo." },
-    { title: "Nossos sonhos", body: "Uma casa com varanda, um cachorro chamado Pão, e mil viagens de mãos dadas. Tudo com você." },
-  ],
-};
 
 const LAYOUTS = { immersive: Immersive, polaroid: Polaroid, editorial: Editorial, gallery: Gallery };
 
@@ -45,14 +15,14 @@ export default async function DevStylePreview({ params }: { params: Promise<{ st
   if (process.env.NODE_ENV === "production") notFound();
 
   const { style } = await params;
-  if (!STYLES.includes(style as Style)) notFound();
-  const Layout = LAYOUTS[style as Style];
+  if (!EXAMPLE_STYLES.includes(style as ExampleStyle)) notFound();
+  const Layout = LAYOUTS[style as ExampleStyle];
 
   return (
     <>
       {/* barra de troca de estilo (só dev) */}
       <div className="fixed left-1/2 top-3 z-[60] flex -translate-x-1/2 gap-1 rounded-full border border-black/10 bg-white/90 p-1 text-xs font-semibold shadow-lg backdrop-blur">
-        {STYLES.map((s) => (
+        {EXAMPLE_STYLES.map((s) => (
           <Link
             key={s}
             href={`/dev/styles/${s}`}
@@ -67,7 +37,7 @@ export default async function DevStylePreview({ params }: { params: Promise<{ st
         ))}
       </div>
 
-      <Layout {...FAKE} />
+      <Layout {...EXAMPLE_PAGE} />
     </>
   );
 }

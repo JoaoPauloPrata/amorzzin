@@ -26,11 +26,11 @@ const FAQ_ITEMS = [
   },
   {
     q: "Posso colocar uma música?",
-    a: "Sim. Cola o link do YouTube ou Spotify e a música toca direto na página.",
+    a: "Sim. Cola o link do YouTube e a música toca direto na página.",
   },
   {
     q: "Quantas fotos posso colocar?",
-    a: "Mensal: até 4 fotos. Anual: até 8 fotos. JPG, PNG ou WebP, até 5MB cada.",
+    a: "Até 8 fotos em qualquer plano. JPG, PNG ou WebP, até 5MB cada.",
   },
   {
     q: "Como entro em contato com suporte?",

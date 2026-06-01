@@ -1,5 +1,7 @@
 "use server";
 
+import sharp from "sharp";
+
 import { getSupabaseServiceClient } from "@/lib/supabase/server";
 import {
   PHOTO_ALLOWED_MIME,
@@ -15,6 +17,34 @@ import {
 } from "@/lib/wizard/schemas";
 
 const BUCKET = "page-photos";
+
+// Reprocessamento de imagem no upload — corta storage e egress (plano free Supabase:
+// 1 GB storage / 5 GB egress/mês). Reduz a dimensão, converte pra WebP e remove EXIF.
+const MAX_DIMENSION = 1600;          // lado maior, px — suficiente pra full-screen retina
+const WEBP_QUALITY  = 80;            // bom equilíbrio qualidade/tamanho
+// Paths são uuid imutáveis → cache agressivo. Views repetidas saem do cache do
+// browser/CDN em vez de contar egress cobrado.
+const CACHE_CONTROL = "31536000";    // 1 ano, em segundos
+
+// Reprocessa a imagem: orienta via EXIF, reduz, converte pra WebP, descarta metadados.
+// Se sharp não conseguir decodificar (ex.: HEIC sem suporte no runtime), faz fallback
+// pro arquivo original pra não bloquear o upload.
+async function reprocessImage(
+  input: Buffer,
+  fallbackMime: PhotoMime,
+): Promise<{ buffer: Buffer; mime: string; ext: string }> {
+  try {
+    const buffer = await sharp(input)
+      .rotate() // aplica orientação EXIF antes de descartar metadados
+      .resize({ width: MAX_DIMENSION, height: MAX_DIMENSION, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: WEBP_QUALITY })
+      .toBuffer();
+    return { buffer, mime: "image/webp", ext: "webp" };
+  } catch (err) {
+    console.warn("reprocessImage falhou — usando arquivo original", err);
+    return { buffer: input, mime: fallbackMime, ext: extFromMime(fallbackMime) };
+  }
+}
 
 export type PhotoDTO = {
   id:         string;
@@ -179,15 +209,19 @@ export async function uploadPhoto(formData: FormData): Promise<UploadPhotoResult
     return { ok: false, error: `Limite de ${maxPhotos} fotos atingido.` };
   }
 
-  const ext  = extFromMime(file.type as PhotoMime);
-  const uuid = crypto.randomUUID();
-  const path = `${idCheck.data.page_id}/${uuid}.${ext}`;
+  const inputBuffer = Buffer.from(await file.arrayBuffer());
+  const processed   = await reprocessImage(inputBuffer, file.type as PhotoMime);
 
-  const buffer = Buffer.from(await file.arrayBuffer());
+  const uuid = crypto.randomUUID();
+  const path = `${idCheck.data.page_id}/${uuid}.${processed.ext}`;
 
   const { error: uploadError } = await ctx.supabase.storage
     .from(BUCKET)
-    .upload(path, buffer, { contentType: file.type, upsert: false });
+    .upload(path, processed.buffer, {
+      contentType:  processed.mime,
+      upsert:       false,
+      cacheControl: CACHE_CONTROL,
+    });
 
   if (uploadError) {
     console.error("uploadPhoto upload failed", uploadError);

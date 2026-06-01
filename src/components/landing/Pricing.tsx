@@ -10,26 +10,28 @@ type Plan = {
   max_message_length: number;
 };
 
+// Benefícios idênticos entre planos — a única diferença é preço + duração.
+// A primeira linha (acesso) reflete a duração, então varia por plano; o resto é igual.
+const SHARED_FEATURES = [
+  "Até 8 fotos no carrossel",
+  "Mensagem com até 1500 caracteres",
+  "QR Code + link no e-mail",
+  "Música embed (YouTube)",
+];
+
 const PLAN_COPY: Record<string, { tagline: string; features: string[]; highlight?: boolean }> = {
   monthly: {
     tagline: "Pra testar e mandar agora.",
     features: [
       "Acesso à página por 30 dias",
-      "Até 4 fotos no carrossel",
-      "Mensagem com até 800 caracteres",
-      "QR Code + link no e-mail",
-      "Música embed (YouTube ou Spotify)",
+      ...SHARED_FEATURES,
     ],
   },
   annual: {
     tagline: "Pra durar o ano todo.",
     features: [
       "Acesso à página por 1 ano",
-      "Até 8 fotos no carrossel",
-      "Mensagem com até 1500 caracteres",
-      "QR Code + link no e-mail",
-      "Música embed (YouTube ou Spotify)",
-      "Suporte prioritário",
+      ...SHARED_FEATURES,
     ],
     highlight: true,
   },

@@ -34,7 +34,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Como entro em contato com suporte?",
-    a: "Manda no Instagram @Amorzin_ ou responde o e-mail de confirmação.",
+    a: "Manda no Instagram @amorzzim ou responde o e-mail de confirmação.",
   },
 ];
 
@@ -99,12 +99,12 @@ export function Faq() {
 
         <div className="mt-10 text-center">
           <a
-            href="https://instagram.com/Amorzin_"
+            href="https://www.instagram.com/amorzzim/"
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-2 text-sm font-medium text-rose-600 hover:text-rose-700"
           >
-            📱 Falar no Instagram @Amorzin_
+            📱 Falar no Instagram @amorzzim
           </a>
         </div>
       </div>

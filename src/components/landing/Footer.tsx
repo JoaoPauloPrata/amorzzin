@@ -13,7 +13,7 @@ export function Footer() {
           <a href="#planos"        className="hover:text-ink">Planos</a>
           <a href="#faq"           className="hover:text-ink">Perguntas</a>
           <a
-            href="https://instagram.com/Amorzin_"
+            href="https://www.instagram.com/amorzzim/"
             target="_blank"
             rel="noreferrer"
             className="hover:text-ink"

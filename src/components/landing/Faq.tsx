@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils/cn";
 
 const FAQ_ITEMS = [
   {
-    q: "O que é a Amorzin?",
+    q: "O que é a Amorzzin?",
     a: "Uma plataforma pra criar páginas personalizadas pra alguém especial — com fotos, mensagem, música e contador de tempo. Você manda o link e a pessoa abre.",
   },
   {

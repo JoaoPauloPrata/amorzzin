@@ -23,9 +23,9 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ style: string }> }): Promise<Metadata> {
   const { style } = await params;
   const label = EXAMPLE_STYLE_LABELS[style as ExampleStyle];
-  if (!label) return { title: "Exemplos — Amorzin" };
+  if (!label) return { title: "Exemplos — Amorzzin" };
   return {
-    title: `Exemplo: estilo ${label} — Amorzin`,
+    title: `Exemplo: estilo ${label} — Amorzzin`,
     description: `Veja como fica uma página de presente no estilo ${label}. Crie a sua em 5 minutos.`,
   };
 }
@@ -44,7 +44,7 @@ export default async function ExemploPage({ params }: { params: Promise<{ style:
         className="fixed left-3 top-3 z-[60] flex items-center gap-1.5 rounded-full border border-black/10 bg-white/90 px-3 py-2 text-xs font-semibold text-ink shadow-lg backdrop-blur transition-colors hover:text-rose-600"
       >
         <span aria-hidden>‹</span>
-        <span className="hidden sm:inline">amorzin</span>
+        <span className="hidden sm:inline">amorzzin</span>
       </Link>
 
       {/* switcher de estilos */}

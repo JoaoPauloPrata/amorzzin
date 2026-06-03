@@ -103,11 +103,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const result = await loadPage(slug);
-  if (result.kind === "expired") return { title: "Página expirada — Amorzin", robots: { index: false } };
-  if (result.kind !== "active") return { title: "Página não encontrada — Amorzin" };
+  if (result.kind === "expired") return { title: "Página expirada — Amorzzin", robots: { index: false } };
+  if (result.kind !== "active") return { title: "Página não encontrada — Amorzzin" };
   const page = result.page;
 
-  const who = page.recipient_name ? `Para ${page.recipient_name}` : "Amorzin";
+  const who = page.recipient_name ? `Para ${page.recipient_name}` : "Amorzzin";
   const title = page.title?.trim() || who;
   const description = page.message?.trim()?.slice(0, 160) || "Uma página feita com amor 💛";
 

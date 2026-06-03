@@ -89,7 +89,7 @@ export function Editorial(props: LayoutProps) {
           </Reveal>
         ))}
 
-        <p className="mt-24 text-center font-sans text-xs text-ink/40">Feito com 💛 na <a href="/" className="underline underline-offset-2 hover:text-rose-600">Amorzin</a></p>
+        <p className="mt-24 text-center font-sans text-xs text-ink/40">Feito com 💛 na <a href="/" className="underline underline-offset-2 hover:text-rose-600">Amorzzin</a></p>
       </article>
 
       {!started && <OpenOverlay emoji={props.emoji} recipient={recipient ?? null} onOpen={open} />}

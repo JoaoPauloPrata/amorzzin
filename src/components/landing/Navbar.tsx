@@ -34,7 +34,7 @@ export function Navbar() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-2xl">💖</span>
-          <span className="text-xl font-semibold tracking-tight text-ink">amorzin</span>
+          <span className="text-xl font-semibold tracking-tight text-ink">amorzzin</span>
         </Link>
 
         <nav className="hidden gap-8 md:flex">

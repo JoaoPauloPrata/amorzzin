@@ -3,8 +3,8 @@ import { Navbar } from "@/components/landing/Navbar";
 import { RecoverForm } from "@/components/recover/RecoverForm";
 
 export const metadata: Metadata = {
-  title: "Recuperar meu link — Amorzin",
-  description: "Reenvie o link da sua página Amorzin para o e-mail usado na compra.",
+  title: "Recuperar meu link — Amorzzin",
+  description: "Reenvie o link da sua página Amorzzin para o e-mail usado na compra.",
 };
 
 export default function RecuperarPage() {

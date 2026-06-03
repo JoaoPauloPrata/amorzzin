@@ -57,7 +57,7 @@ Service-role key fica em env do Vercel (Server Actions) **e** em `supabase secre
 4. **Webhook** — MP chama `mp-webhook` (Edge). Valida HMAC, busca pagamento via API MP, atualiza `payment_orders.status`. Se `approved`:
    - `pages.status = 'active'`, `activated_at = now()`, `expires_at = now() + duration_days` (NULL na coluna = sem expiração — coluna mantida nullable pra promo/giveaway futuro, mas nenhum plano ativo usa NULL).
    - Invoca `send-confirmation-email`.
-5. **E-mail** — Resend manda HTML com link `https://amorzin.com/p/<slug>` + QR Code anexado (gerado por `qrcode` npm, salvo em bucket `page-qrcodes`).
+5. **E-mail** — Resend manda HTML com link `https://amorzzin.com/p/<slug>` + QR Code anexado (gerado por `qrcode` npm, salvo em bucket `page-qrcodes`).
 6. **Visualizar** — `/p/[slug]` Server Component SSR + ISR (`revalidate=60`). `opengraph-image.tsx` gera preview dinâmico pra WhatsApp/Instagram.
 
 ## Identidade sem auth

@@ -26,7 +26,7 @@ Acessar: <http://localhost:3000>
 | `NEXT_PUBLIC_SUPABASE_URL`       | Browser + Server                   | Próprio do projeto Supabase  |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY`  | Browser + Server                   | Modern key `sb_publishable_…`|
 | `SUPABASE_SERVICE_ROLE_KEY`      | Server Actions Next + Edge Functions | Server-only (NUNCA usar em código que rode no browser). Local: `.env.local`. Vercel: env vars. Edge: `supabase secrets set`. |
-| `NEXT_PUBLIC_SITE_URL`           | Browser + Server                   | `http://localhost:3000` dev, `https://amorzin.com` prod |
+| `NEXT_PUBLIC_SITE_URL`           | Browser + Server                   | `http://localhost:3000` dev, `https://amorzzin.com` prod |
 | `SUPABASE_DB_URL`                | CLI (`supabase db push`, psql)     | Connection string Postgres   |
 | `MP_ACCESS_TOKEN`                | Server Action `createPaymentPreference` + Edge `mp-webhook` | Local: `.env.local`. Vercel: env vars. Edge: `supabase secrets set`. Use `TEST-…` em dev. |
 | `MP_WEBHOOK_SECRET`              | Edge `mp-webhook` apenas           | `supabase secrets set`. Pegar em painel MP > Webhooks > Configurar notificações |

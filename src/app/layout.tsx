@@ -29,7 +29,7 @@ const caveat = Caveat({
 });
 
 export const metadata: Metadata = {
-  title: "Amorzin — Páginas personalizadas com amor",
+  title: "Amorzzin — Páginas personalizadas com amor",
   description:
     "Crie uma página personalizada com fotos, contador de tempo e mensagem para presentear quem você ama.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),

@@ -70,7 +70,7 @@ export function Gallery(props: LayoutProps) {
           </div>
         )}
 
-        <p className="mt-14 text-center text-[11px] text-ink/40">Feito com 💛 na <a href="/" className="underline underline-offset-2 hover:text-rose-600">Amorzin</a></p>
+        <p className="mt-14 text-center text-[11px] text-ink/40">Feito com 💛 na <a href="/" className="underline underline-offset-2 hover:text-rose-600">Amorzzin</a></p>
       </section>
 
       {/* lightbox */}

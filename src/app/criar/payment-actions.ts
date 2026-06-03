@@ -78,7 +78,7 @@ export async function createPaymentPreference(input: CreatePreferenceInput): Pro
         items: [
           {
             id:          plan.id,
-            title:       `Amorzin — Plano ${plan.display_name}`,
+            title:       `Amorzzin — Plano ${plan.display_name}`,
             description: `Página de presente personalizada (${page.recipient_name ?? "para alguém especial"})`,
             quantity:    1,
             currency_id: "BRL",
@@ -105,7 +105,7 @@ export async function createPaymentPreference(input: CreatePreferenceInput): Pro
         },
         notification_url: `${supabaseUrl}/functions/v1/mp-webhook`,
         external_reference: page_id,
-        statement_descriptor: "AMORZIN",
+        statement_descriptor: "AMORZZIN",
         metadata: { page_id, plan_id },
       },
     });

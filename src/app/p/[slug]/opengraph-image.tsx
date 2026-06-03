@@ -8,7 +8,7 @@ import { getSupabaseAnonServerClient } from "@/lib/supabase/server";
 // Só páginas ativas (RLS via anon) entram; senão cai no fallback de marca.
 
 export const runtime = "nodejs";
-export const alt = "Página personalizada feita na Amorzin";
+export const alt = "Página personalizada feita na Amorzzin";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -107,7 +107,7 @@ export default async function OgImage({ params }: { params: Promise<{ slug: stri
         {/* marca no topo */}
         <div style={{ position: "absolute", top: 56, left: 80, display: "flex", alignItems: "center", color: "#ffffff", fontSize: 34, fontWeight: 700 }}>
           <span style={{ display: "flex", color: "#FF9DBE", marginRight: 12, fontSize: 38 }}>♥</span>
-          amorzin
+          amorzzin
         </div>
       </div>
     ),

@@ -88,7 +88,7 @@ export function Immersive(props: LayoutProps) {
       {started && (
         <div className="relative z-10 mx-auto max-w-md px-7 pb-20">
           <StorySections sections={sections} variant="dark" />
-          <p className="mt-14 text-center text-[11px] text-white/50">Feito com 💛 na <a href="/" className="underline underline-offset-2 hover:text-white">Amorzin</a></p>
+          <p className="mt-14 text-center text-[11px] text-white/50">Feito com 💛 na <a href="/" className="underline underline-offset-2 hover:text-white">Amorzzin</a></p>
         </div>
       )}
 

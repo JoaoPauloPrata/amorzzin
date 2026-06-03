@@ -5,12 +5,12 @@ export function Footer() {
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 px-6 md:flex-row">
         <div className="flex items-center gap-2">
           <span className="text-xl">💖</span>
-          <span className="font-semibold text-ink">amorzin</span>
+          <span className="font-semibold text-ink">amorzzin</span>
         </div>
 
         <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ink/60">
           <a href="#como-funciona" className="hover:text-ink">Como funciona</a>
-          <a href="#planos"        className="hover:text-ink">Planos</a>
+          <a href="#planos"        className="hover:text-ink">Preços</a>
           <a href="#faq"           className="hover:text-ink">Perguntas</a>
           <a
             href="https://www.instagram.com/amorzzim/"
@@ -22,7 +22,7 @@ export function Footer() {
           </a>
         </nav>
 
-        <p className="text-xs text-ink/70">© {year} Amorzin · Feito com 💖</p>
+        <p className="text-xs text-ink/70">© {year} Amorzzin · Feito com 💖</p>
       </div>
     </footer>
   );

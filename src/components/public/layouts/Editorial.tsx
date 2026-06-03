@@ -1,7 +1,7 @@
 "use client";
 
 import { DateCounter } from "@/components/wizard/DateCounter";
-import { OpenOverlay, MusicPlayer, Reveal, useReveal, type LayoutProps } from "../shared";
+import { OpenOverlay, MusicPlayer, Reveal, useReveal, type LayoutProps, type Section } from "../shared";
 import { cn } from "@/lib/utils/cn";
 
 export function Editorial(props: LayoutProps) {
@@ -13,6 +13,15 @@ export function Editorial(props: LayoutProps) {
 
   const cover = photos[0];
   const rest = photos.slice(1);
+
+  // intercala seção de texto e foto: texto, foto, texto, foto... e anexa o que sobrar
+  type Block = { kind: "section"; section: Section; index: number } | { kind: "photo"; url: string; index: number };
+  const blocks: Block[] = [];
+  const max = Math.max(sections.length, rest.length);
+  for (let i = 0; i < max; i++) {
+    if (i < sections.length) blocks.push({ kind: "section", section: sections[i], index: i });
+    if (i < rest.length) blocks.push({ kind: "photo", url: rest[i], index: i });
+  }
 
   return (
     <main className={cn("relative min-h-[100svh] w-full overflow-x-hidden bg-[#f7f0e6] font-serif text-ink transition-opacity duration-1000", started ? "opacity-100" : "opacity-0")}>
@@ -62,32 +71,31 @@ export function Editorial(props: LayoutProps) {
           </Reveal>
         )}
 
-        {/* seções numeradas, estilo revista */}
-        {sections.map((s, i) => (
-          <Reveal key={i} className="mt-16">
-            <div className="flex items-baseline gap-3">
-              <span className="font-sans text-sm font-bold tracking-widest text-rose-400">{String(i + 1).padStart(2, "0")}</span>
-              <span className="h-px flex-1 translate-y-[-4px] bg-ink/15" />
-            </div>
-            {s.title && <h2 className="mt-3 break-words font-serif text-3xl font-medium italic text-ink md:text-4xl">{s.title}</h2>}
-            <p className="mt-4 whitespace-pre-line break-words text-lg leading-relaxed text-ink/80">{s.body}</p>
-          </Reveal>
-        ))}
-
-        {/* fotos alternando, com legenda */}
-        {rest.map((url, i) => (
-          <Reveal key={url} className="mt-16">
-            <figure className={cn(i % 2 === 0 ? "md:-mx-10" : "md:-mx-10")}>
-              <div className="overflow-hidden rounded-sm shadow-xl">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={url} alt="" className="aspect-[4/5] w-full object-cover transition-transform duration-[1.2s] hover:scale-[1.04]" />
+        {/* alterna seção de texto e foto, estilo revista */}
+        {blocks.map((b) =>
+          b.kind === "section" ? (
+            <Reveal key={`s-${b.index}`} className="mt-16">
+              <div className="flex items-baseline gap-3">
+                <span className="font-sans text-sm font-bold tracking-widest text-rose-400">{String(b.index + 1).padStart(2, "0")}</span>
+                <span className="h-px flex-1 translate-y-[-4px] bg-ink/15" />
               </div>
-              <figcaption className="mt-3 text-center font-sans text-[11px] uppercase tracking-[0.3em] text-ink/40">
-                — {String(i + 2).padStart(2, "0")} —
-              </figcaption>
-            </figure>
-          </Reveal>
-        ))}
+              {b.section.title && <h2 className="mt-3 break-words font-serif text-3xl font-medium italic text-ink md:text-4xl">{b.section.title}</h2>}
+              <p className="mt-4 whitespace-pre-line break-words text-lg leading-relaxed text-ink/80">{b.section.body}</p>
+            </Reveal>
+          ) : (
+            <Reveal key={`p-${b.index}`} className="mt-16">
+              <figure className="md:-mx-10">
+                <div className="overflow-hidden rounded-sm shadow-xl">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={b.url} alt="" className="aspect-[4/5] w-full object-cover transition-transform duration-[1.2s] hover:scale-[1.04]" />
+                </div>
+                <figcaption className="mt-3 text-center font-sans text-[11px] uppercase tracking-[0.3em] text-ink/40">
+                  — {String(b.index + 2).padStart(2, "0")} —
+                </figcaption>
+              </figure>
+            </Reveal>
+          )
+        )}
 
         <p className="mt-24 text-center font-sans text-xs text-ink/40">Feito com 💛 na <a href="/" className="underline underline-offset-2 hover:text-rose-600">Amorzzin</a></p>
       </article>

@@ -62,13 +62,13 @@ export async function Pricing() {
       <div className="mx-auto max-w-6xl px-6">
         <div className="mx-auto max-w-2xl text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white/60 px-4 py-1.5 text-xs font-semibold text-rose-700 backdrop-blur">
-            💎 Planos
+            💎 Pagamento único
           </span>
           <h2 className="mt-4 font-display text-4xl font-bold leading-tight text-ink md:text-5xl">
-            Pague uma vez. <span className="gradient-text">Sem assinatura.</span>
+            Não é assinatura. <span className="gradient-text">É pagar uma vez só.</span>
           </h2>
           <p className="mt-4 text-lg text-ink/70 text-balance">
-            Escolha por quanto tempo a página fica no ar. Pix ou cartão.
+            Escolha o valor pelo tempo que a página fica no ar. Cada compra cria uma página. Pix ou cartão.
           </p>
         </div>
 
@@ -143,7 +143,7 @@ export async function Pricing() {
         </div>
 
         <p className="mt-8 text-center text-xs text-ink/50">
-          Pagamento processado pelo MercadoPago. Pix, cartão de crédito ou débito.
+          Pagamento único pelo MercadoPago — Pix, cartão de crédito ou débito. Sem mensalidade, sem renovação automática. Cada compra gera uma única página.
         </p>
       </div>
     </section>

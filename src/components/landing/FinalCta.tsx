@@ -25,7 +25,7 @@ export function FinalCta() {
             href="#planos"
             className="text-sm font-medium text-white/90 underline-offset-4 hover:underline"
           >
-            Ver planos
+            Ver preços
           </a>
         </div>
       </div>

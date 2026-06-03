@@ -13,6 +13,14 @@ const FAQ_ITEMS = [
     a: "Não. Você preenche, paga e recebe o link por e-mail. Sem cadastro, sem senha, sem assinatura.",
   },
   {
+    q: "É uma assinatura? Vou ser cobrado de novo?",
+    a: "Não. É um pagamento único — você paga uma vez e pronto. Sem mensalidade, sem renovação automática, sem cobrança recorrente. O valor muda só conforme o tempo que você quer a página no ar.",
+  },
+  {
+    q: "Quantas páginas posso criar com um pagamento?",
+    a: "Cada pagamento cria uma única página. Se quiser fazer outra pra outra pessoa, é só criar e pagar de novo.",
+  },
+  {
     q: "Como recebo a página depois de pagar?",
     a: "Assim que o pagamento for confirmado, mandamos um e-mail com o link público e um QR Code anexado. Pix é instantâneo, cartão também na maioria dos casos.",
   },

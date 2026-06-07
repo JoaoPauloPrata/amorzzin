@@ -24,6 +24,7 @@ export function Editorial(props: LayoutProps) {
   }
 
   return (
+    <>
     <main className={cn("relative min-h-[100svh] w-full overflow-x-hidden bg-[#f7f0e6] font-serif text-ink transition-opacity duration-1000", started ? "opacity-100" : "opacity-0")}>
       {/* capa */}
       <header className="relative flex h-[88svh] items-end overflow-hidden">
@@ -99,9 +100,10 @@ export function Editorial(props: LayoutProps) {
 
         <p className="mt-24 text-center font-sans text-xs text-ink/40">Feito com 💛 na <a href="/" className="underline underline-offset-2 hover:text-rose-600">Amorzzin</a></p>
       </article>
-
-      {!started && <OpenOverlay emoji={props.emoji} recipient={recipient ?? null} onOpen={open} />}
-      {started && props.musicVideoId && <MusicPlayer videoId={props.musicVideoId} />}
     </main>
+
+    {!started && <OpenOverlay emoji={props.emoji} recipient={recipient ?? null} onOpen={open} />}
+    {started && props.musicVideoId && <MusicPlayer videoId={props.musicVideoId} />}
+    </>
   );
 }

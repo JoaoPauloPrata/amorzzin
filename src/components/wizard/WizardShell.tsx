@@ -3,35 +3,25 @@
 import { useEffect } from "react";
 import { useWizardStore } from "@/lib/wizard/store";
 import { useHydrated } from "@/lib/wizard/use-hydrated";
-import { cn } from "@/lib/utils/cn";
-import { Step1Title }   from "./steps/Step1Title";
-import { Step2Message } from "./steps/Step2Message";
-import { Step3Date }    from "./steps/Step3Date";
+import { StepIdentity } from "./steps/StepIdentity";
+import { StepMessage }  from "./steps/StepMessage";
 import { Step4Photos }  from "./steps/Step4Photos";
-import { StepStyle }    from "./steps/StepStyle";
-import { Step5Music }   from "./steps/Step5Music";
-import { StepContact }  from "./steps/StepContact";
-import { StepPlan }     from "./steps/StepPlan";
-import { StepReview }   from "./steps/StepReview";
+import { StepVisual }   from "./steps/StepVisual";
+import { StepFinalize } from "./steps/StepFinalize";
 import { PreviewPanel } from "./PreviewPanel";
 import { PreviewMobile } from "./PreviewMobile";
 
 const STEPS = [
-  { id: "title",   label: "Pra quem"  },
-  { id: "message", label: "Mensagem"  },
-  { id: "date",    label: "Data"      },
-  { id: "photos",  label: "Fotos"     },
-  { id: "style",   label: "Estilo"    },
-  { id: "music",   label: "Música"    },
-  { id: "contact", label: "Contato"   },
-  { id: "plan",    label: "Plano"     },
-  { id: "review",  label: "Revisar"   },
+  { id: "identity", label: "Identidade" },
+  { id: "message",  label: "Mensagem"   },
+  { id: "photos",   label: "Fotos"      },
+  { id: "visual",   label: "Visual"     },
+  { id: "finalize", label: "Finalizar"  },
 ];
 
 export function WizardShell() {
   const hydrated = useHydrated();
   const step      = useWizardStore((s) => s.step);
-  const maxStep   = useWizardStore((s) => s.maxStep);
   const setStep   = useWizardStore((s) => s.setStep);
   const pageId    = useWizardStore((s) => s.pageId);
 
@@ -39,6 +29,12 @@ export function WizardShell() {
     if (!hydrated) return;
     if (step > 0 && !pageId) setStep(0);
   }, [hydrated, pageId, step, setStep]);
+
+  // Ao trocar de etapa, rola pro topo — garante que os campos da nova tela
+  // (ex.: plano + e-mail) fiquem visíveis em vez de abrir no meio/rodapé.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step]);
 
   if (!hydrated) {
     return (
@@ -51,94 +47,52 @@ export function WizardShell() {
   };
   const onBack = () => step > 0 && setStep(step - 1);
 
+  const pct = Math.round(((step + 1) / STEPS.length) * 100);
+
   return (
     <div className="mx-auto max-w-6xl px-6 pt-28 pb-28 md:pb-16">
-      <ProgressBar current={step} maxStep={maxStep} onStep={setStep} />
+      {/* seta de voltar */}
+      <button
+        type="button"
+        onClick={onBack}
+        disabled={step === 0}
+        aria-label="Voltar"
+        className="rounded-full p-1.5 text-ink/60 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-30"
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+      </button>
 
-      <div className="mt-10 grid grid-cols-1 gap-10 md:grid-cols-[minmax(0,1fr)_320px] md:gap-14">
-        <section className="rounded-3xl border border-rose-100 bg-white/70 p-6 backdrop-blur md:p-10">
-          {step === 0 && <Step1Title   onNext={onNext} />}
-          {step === 1 && <Step2Message onNext={onNext} onBack={onBack} />}
-          {step === 2 && <Step3Date    onNext={onNext} onBack={onBack} />}
-          {step === 3 && <Step4Photos  onNext={onNext} onBack={onBack} />}
-          {step === 4 && <StepStyle    onNext={onNext} onBack={onBack} />}
-          {step === 5 && <Step5Music   onNext={onNext} onBack={onBack} />}
-          {step === 6 && <StepContact  onNext={onNext} onBack={onBack} />}
-          {step === 7 && <StepPlan     onNext={onNext} onBack={onBack} />}
-          {step === 8 && <StepReview                   onBack={onBack} />}
-        </section>
+      <div className="mt-4 grid grid-cols-1 gap-10 md:grid-cols-[minmax(0,1fr)_320px] md:gap-14">
+        <div className="space-y-3">
+          {/* barra de progresso — logo acima do card, rosa sólida */}
+          <div
+            className="h-2 w-full overflow-hidden rounded-full bg-rose-100"
+            role="progressbar"
+            aria-valuenow={pct}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <div
+              className="h-full rounded-full bg-rose-500 transition-all duration-500 ease-out"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+
+          <section className="rounded-3xl border border-rose-100 bg-white/70 p-6 backdrop-blur md:p-10">
+            {step === 0 && <StepIdentity onNext={onNext} />}
+            {step === 1 && <StepMessage  onNext={onNext} onBack={onBack} />}
+            {step === 2 && <Step4Photos  onNext={onNext} onBack={onBack} />}
+            {step === 3 && <StepVisual   onNext={onNext} onBack={onBack} />}
+            {step === 4 && <StepFinalize                 onBack={onBack} />}
+          </section>
+        </div>
 
         <PreviewPanel />
       </div>
 
       <PreviewMobile />
     </div>
-  );
-}
-
-function ProgressBar({
-  current,
-  maxStep,
-  onStep,
-}: {
-  current: number;
-  maxStep: number;
-  onStep: (step: number) => void;
-}) {
-  return (
-    <ol className="flex flex-wrap items-center gap-2 md:gap-3">
-      {STEPS.map((s, i) => {
-        const isActive    = i === current;
-        const isDone      = i < maxStep && !isActive;
-        // Navegável: qualquer passo já alcançado (≤ maxStep), exceto o atual.
-        const isClickable = i <= maxStep && !isActive;
-
-        const badge = (
-          <span
-            className={cn(
-              "grid h-7 w-7 place-items-center rounded-full text-xs font-bold transition-colors",
-              isActive && "bg-gradient-to-r from-rose-500 to-lilac-500 text-white shadow-soft",
-              isDone   && "bg-rose-100 text-rose-600",
-              !isActive && !isDone && "bg-ink/10 text-ink/50",
-            )}
-          >
-            {isDone ? "✓" : i + 1}
-          </span>
-        );
-
-        const label = (
-          <span className={cn(
-            "hidden text-sm font-medium md:inline",
-            isActive ? "text-ink" : "text-ink/50",
-          )}>
-            {s.label}
-          </span>
-        );
-
-        return (
-          <li key={s.id} className="flex items-center gap-2">
-            {isClickable ? (
-              <button
-                type="button"
-                onClick={() => onStep(i)}
-                className="flex items-center gap-2 rounded-full transition-opacity hover:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
-                aria-label={`Ir para etapa ${i + 1}: ${s.label}`}
-              >
-                {badge}
-                {label}
-              </button>
-            ) : (
-              <div className="flex items-center gap-2" aria-current={isActive ? "step" : undefined}>
-                {badge}
-                {label}
-              </div>
-            )}
-            {i < STEPS.length - 1 && (
-              <span className="hidden h-px w-4 bg-ink/15 md:block" />
-            )}
-          </li>
-        );
-      })}
-    </ol>
   );
 }

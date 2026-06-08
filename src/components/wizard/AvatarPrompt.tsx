@@ -34,10 +34,12 @@ export function AvatarPrompt({ text }: { text: string }) {
         <div className="grid h-24 w-24 place-items-center overflow-hidden rounded-full bg-gradient-to-br from-rose-100 to-lilac-100 shadow-soft md:h-28 md:w-28">
           <video
             src="/cupido-voando.mp4"
+            poster="/cupido2.webp"
             autoPlay
             loop
             muted
             playsInline
+            preload="auto"
             className="h-full w-full object-cover"
           />
         </div>

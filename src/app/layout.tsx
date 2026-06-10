@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { Fraunces, Caveat } from "next/font/google";
 import "./globals.css";
 
+import { ClarityAnalytics } from "@/components/ClarityAnalytics";
 import { MetaPixel } from "@/components/MetaPixel";
 
 const geistSans = localFont({
@@ -48,6 +49,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} ${caveat.variable} antialiased`}
       >
         <MetaPixel />
+        <ClarityAnalytics />
         {children}
       </body>
     </html>

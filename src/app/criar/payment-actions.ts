@@ -176,6 +176,8 @@ export type GetPaymentOrderStatusResult =
       status: PaymentOrderStatus | null;
       page_status: string;
       slug: string;
+      amount_cents: number | null;
+      plan_id: string | null;
     }
   | { ok: false; error: string };
 
@@ -204,7 +206,7 @@ export async function getPaymentOrderStatus(
   // mais recente primeiro
   const { data: order, error: orderError } = await supabase
     .from("payment_orders")
-    .select("status, created_at")
+    .select("status, created_at, amount_cents, plan_id")
     .eq("page_id", parsed.data.page_id)
     .order("created_at", { ascending: false })
     .limit(1)
@@ -217,8 +219,10 @@ export async function getPaymentOrderStatus(
 
   return {
     ok: true,
-    status:      (order?.status as PaymentOrderStatus | undefined) ?? null,
-    page_status: page.status,
-    slug:        page.slug,
+    status:       (order?.status as PaymentOrderStatus | undefined) ?? null,
+    page_status:  page.status,
+    slug:         page.slug,
+    amount_cents: order?.amount_cents ?? null,
+    plan_id:      order?.plan_id ?? null,
   };
 }

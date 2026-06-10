@@ -6,9 +6,35 @@ import { useEffect, useState } from "react";
 import { useWizardStore } from "@/lib/wizard/store";
 import { useHydrated } from "@/lib/wizard/use-hydrated";
 import { getPaymentOrderStatus, type PaymentOrderStatus } from "@/app/criar/payment-actions";
+import { fbqTrack } from "@/lib/meta-pixel";
 
 const POLL_INTERVAL_MS = 2000;
 const POLL_TIMEOUT_MS  = 60_000;
+
+/**
+ * Dispara o evento Purchase do Meta Pixel uma única vez por página paga.
+ * Guarda flag no localStorage (reload da página de retorno re-poll e cairia
+ * aqui de novo) e usa o page_id como eventID pra dedup no lado do Meta.
+ */
+function trackPurchaseOnce(pageId: string, amountCents: number | null, planId: string | null) {
+  const key = `amorzin_fbq_purchase_${pageId}`;
+  try {
+    if (localStorage.getItem(key)) return;
+    localStorage.setItem(key, "1");
+  } catch {
+    // localStorage indisponível (modo privado etc.) — segue com dedup só por eventID
+  }
+  fbqTrack(
+    "Purchase",
+    {
+      value:        amountCents != null ? amountCents / 100 : undefined,
+      currency:     "BRL",
+      content_ids:  planId ? [planId] : undefined,
+      content_type: "product",
+    },
+    pageId,
+  );
+}
 
 type UIState =
   | { kind: "hydrating" }
@@ -68,6 +94,7 @@ export function PaymentReturn({
       }
 
       if (res.status === "approved" || res.page_status === "active") {
+        trackPurchaseOnce(pageId, res.amount_cents, res.plan_id);
         setState({ kind: "approved", slug: res.slug });
         return;
       }

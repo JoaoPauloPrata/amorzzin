@@ -9,6 +9,7 @@ import { useWizardStore } from "@/lib/wizard/store";
 import { updatePage } from "@/app/criar/actions";
 import { listPlans, type PlanDTO } from "@/app/criar/plan-actions";
 import { createPaymentPreference } from "@/app/criar/payment-actions";
+import { fbqTrack } from "@/lib/meta-pixel";
 import { cn } from "@/lib/utils/cn";
 import { StepNav } from "../StepNav";
 
@@ -104,6 +105,13 @@ export function StepFinalize({ onBack }: { onBack: () => void }) {
       plan_id:    selected,
     });
     if (!res.ok) { setErr(res.error); setPaying(false); return; }
+
+    fbqTrack("InitiateCheckout", {
+      value:        selectedPlan ? selectedPlan.price_cents / 100 : undefined,
+      currency:     "BRL",
+      content_ids:  [selected],
+      content_type: "product",
+    });
 
     window.location.href = res.init_point;
   });

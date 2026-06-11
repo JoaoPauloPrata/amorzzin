@@ -16,7 +16,7 @@ const BAR_GAP = 8;
 export function PreviewPanel() {
   const draft  = useWizardStore((s) => s.draft);
   const photos = useWizardStore((s) => s.photos);
-  const style  = draft.layout_style ?? "immersive";
+  const style  = draft.layout_style ?? "polaroid";
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [barFrac, setBarFrac] = useState({ size: 1, pos: 0 }); // frações 0..1

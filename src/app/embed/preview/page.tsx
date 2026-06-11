@@ -14,12 +14,12 @@ type Payload = LayoutProps & { style: string };
 const LAYOUTS = { immersive: Immersive, polaroid: Polaroid, editorial: Editorial, gallery: Gallery } as const;
 
 const INITIAL: Payload = {
-  style: "immersive",
+  style: "polaroid",
   title: "Seu título aparece aqui",
   recipient: null,
   message: "Sua mensagem aparece aqui assim que você digitar…",
   relationshipStart: null,
-  photos: [],
+  photos: ["/preview-placeholder.png"],
   musicVideoId: null,
   emoji: "❤️",
   sections: [],
@@ -44,7 +44,7 @@ export default function PreviewEmbed() {
     return () => window.removeEventListener("message", onMsg);
   }, []);
 
-  const Layout = LAYOUTS[data.style as keyof typeof LAYOUTS] ?? Immersive;
+  const Layout = LAYOUTS[data.style as keyof typeof LAYOUTS] ?? Polaroid;
   return (
     <>
       {/* rola por dentro, mas SEM barra nativa — a barra visível fica fora da moldura

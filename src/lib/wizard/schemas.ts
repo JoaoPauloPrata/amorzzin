@@ -131,9 +131,10 @@ export const SECTION_PRESETS: { title: string; placeholder: string }[] = [
 export const LAYOUT_STYLES = ["immersive", "polaroid", "editorial", "gallery"] as const;
 export type LayoutStyle = (typeof LAYOUT_STYLES)[number];
 
+// Polaroid primeiro: é o estilo padrão do wizard/preview.
 export const LAYOUT_OPTIONS: { id: LayoutStyle; nome: string; desc: string }[] = [
-  { id: "immersive", nome: "Imersivo",  desc: "Fotos preenchem a tela, texto por cima" },
   { id: "polaroid",  nome: "Polaroid",  desc: "Fotos como retratos inclinados num cartão" },
+  { id: "immersive", nome: "Imersivo",  desc: "Fotos preenchem a tela, texto por cima" },
   { id: "editorial", nome: "Revista",   desc: "Capa elegante, leitura em rolagem" },
   { id: "gallery",   nome: "Galeria",   desc: "Mosaico de fotos com toque pra ampliar" },
 ];

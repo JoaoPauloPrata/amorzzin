@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body { width: 800px; height: 1000px; overflow: hidden; }
+
+  .card {
+    position: relative;
+    width: 800px;
+    height: 1000px;
+    background: linear-gradient(160deg, #fdf2f4 0%, #fce7ef 35%, #f3e8fd 70%, #ede9fe 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Caveat', cursive;
+  }
+
+  /* corações flutuantes */
+  .heart {
+    position: absolute;
+    line-height: 1;
+    user-select: none;
+  }
+  .h1  { top: 8%;  left: 12%; font-size: 64px; opacity: .55; transform: rotate(-14deg); }
+  .h2  { top: 14%; right: 14%; font-size: 44px; opacity: .40; transform: rotate(12deg); }
+  .h3  { top: 30%; left: 7%;  font-size: 36px; opacity: .30; transform: rotate(8deg); }
+  .h4  { top: 26%; right: 6%; font-size: 56px; opacity: .45; transform: rotate(-10deg); }
+  .h5  { bottom: 26%; left: 10%; font-size: 52px; opacity: .45; transform: rotate(16deg); }
+  .h6  { bottom: 30%; right: 11%; font-size: 38px; opacity: .35; transform: rotate(-8deg); }
+  .h7  { bottom: 10%; left: 22%; font-size: 42px; opacity: .40; transform: rotate(-18deg); }
+  .h8  { bottom: 8%;  right: 20%; font-size: 60px; opacity: .50; transform: rotate(10deg); }
+  .h9  { top: 6%;  left: 45%; font-size: 38px; opacity: .30; transform: rotate(6deg); }
+
+  .center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 1;
+  }
+
+  .big-heart {
+    font-size: 130px;
+    line-height: 1;
+    filter: drop-shadow(0 8px 18px rgba(225, 29, 72, .25));
+    margin-bottom: 24px;
+  }
+
+  h1 {
+    font-size: 110px;
+    font-weight: 700;
+    color: #9f1239;
+    transform: rotate(-2deg);
+  }
+
+  p {
+    font-size: 58px;
+    font-weight: 600;
+    color: #be185d;
+    opacity: .75;
+    transform: rotate(-2deg);
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <span class="heart h1">🩷</span>
+    <span class="heart h2">💜</span>
+    <span class="heart h3">💗</span>
+    <span class="heart h4">🩷</span>
+    <span class="heart h5">💜</span>
+    <span class="heart h6">💗</span>
+    <span class="heart h7">🩷</span>
+    <span class="heart h8">💜</span>
+    <span class="heart h9">💗</span>
+
+    <div class="center">
+      <span class="big-heart">❤️</span>
+      <h1>Suas fotos</h1>
+      <p>vão aparecer aqui ✨</p>
+    </div>
+  </div>
+</body>
+</html>

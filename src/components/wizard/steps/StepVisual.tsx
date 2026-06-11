@@ -80,7 +80,7 @@ export function StepVisual({ onNext, onBack }: { onNext: () => void; onBack: () 
   const editToken  = useWizardStore((s) => s.editToken);
   const patchDraft = useWizardStore((s) => s.patchDraft);
 
-  const [selectedLayout, setSelectedLayout] = useState<LayoutStyle>(draft.layout_style ?? "immersive");
+  const [selectedLayout, setSelectedLayout] = useState<LayoutStyle>(draft.layout_style ?? "polaroid");
   // Seções extras vêm pré-preenchidas com um exemplo (a pessoa edita se quiser).
   const [sections, setSections] = useState<Section[]>(
     draft.sections ?? EXAMPLE_SECTIONS[0].map((s) => ({ ...s })),
